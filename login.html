@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | M&M Kid's Wear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Common Auth CSS -->
+  <link rel="stylesheet" href="auth.css">
+</head>
+
+<body>
+
+  <div class="auth-container">
+    <h2>Welcome Back</h2>
+    <p class="auth-subtitle">Login to continue shopping</p>
+
+    <!-- Email -->
+    <div class="auth-group">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="Enter your email" />
+    </div>
+
+    <!-- Password -->
+    <div class="auth-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Enter your password" />
+    </div>
+
+    <!-- Login Button -->
+    <button class="auth-btn" onclick="login()">
+      Login
+    </button>
+
+    <!-- Message -->
+    <div class="auth-message" id="msg"></div>
+
+    <!-- Footer -->
+    <div class="auth-footer">
+      Don’t have an account?
+      <a href="signup.html">Create Account</a>
+    </div>
+  </div>
+
+  <script>
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const msg = document.getElementById("msg");
+
+      if (!email || !password) {
+        msg.innerText = "Email and password are required";
+        return;
+      }
+
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        window.location.href = "index.html";
+      } else {
+        msg.innerText = data.message || "Login failed";
+      }
+    }
+  </script>
+
+</body>
+
+</html>

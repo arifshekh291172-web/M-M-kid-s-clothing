@@ -1,0 +1,195 @@
+/* ------------------ RESET ------------------ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ------------------ BODY ------------------ */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2874f0, #1e40af);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ------------------ CARD ------------------ */
+.auth-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  padding: 35px;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: fadeUp 0.6s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ------------------ HEADING ------------------ */
+.auth-container h2 {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+/* ------------------ INPUT ------------------ */
+.auth-group {
+  margin-bottom: 18px;
+}
+
+.auth-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.auth-group input {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
+  font-size: 15px;
+  transition: 0.25s;
+}
+
+.auth-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ------------------ BUTTON ------------------ */
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  background: #2874f0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 5px;
+}
+
+.auth-btn:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+}
+
+/* ------------------ LINKS ------------------ */
+.auth-footer {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ------------------ MESSAGE ------------------ */
+.auth-message {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* ------------------ MOBILE ------------------ */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 28px 22px;
+    border-radius: 12px;
+  }
+}
+/* ------------------ LOGIN BUTTON (PRO) ------------------ */
+.auth-btn {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  background: linear-gradient(135deg, #2874f0, #1e40af);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Hover */
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(40, 116, 240, 0.35);
+}
+
+/* Click */
+.auth-btn:active {
+  transform: scale(0.98);
+}
+
+/* Disabled (Loading) */
+.auth-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Loading Spinner */
+.auth-btn.loading {
+  pointer-events: none;
+  background: #9ca3af;
+}
+
+.auth-btn.loading::after {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border: 3px solid #ffffff;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

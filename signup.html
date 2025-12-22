@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signup | M&M Kid's Wear</title>
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<div class="auth-container">
+  <h2>Create Account</h2>
+
+  <div class="auth-group">
+    <label>Name</label>
+    <input type="text" id="name" placeholder="Your name">
+  </div>
+
+  <div class="auth-group">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="Email">
+  </div>
+
+  <div class="auth-group">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Strong password">
+  </div>
+
+  <div class="auth-group">
+    <label>Confirm Password</label>
+    <input type="password" id="confirm" placeholder="Confirm password">
+  </div>
+
+  <button class="auth-btn" onclick="sendOtp()">Send OTP</button>
+
+  <div id="msg" class="auth-message"></div>
+</div>
+
+<script>
+const passwordRegex =
+/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+async function sendOtp() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
+  const msg = document.getElementById("msg");
+
+  msg.innerText = "";
+
+  if (!name || !email || !password || !confirm) {
+    msg.innerText = "All fields are required";
+    return;
+  }
+
+  if (password !== confirm) {
+    msg.innerText = "Passwords do not match";
+    return;
+  }
+
+  if (!passwordRegex.test(password)) {
+    msg.innerText =
+      "Password must be 8+ chars with uppercase, lowercase, number & symbol";
+    return;
+  }
+
+  const res = await fetch("http://localhost:5000/api/auth/send-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email })
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    msg.innerText = data.message;
+    return;
+  }
+
+  // 🔐 STORE DATA FOR OTP PAGE
+  sessionStorage.setItem(
+    "signupData",
+    JSON.stringify({ name, email, password })
+  );
+
+  window.location.href = "verify-otp.html";
+}
+</script>
+
+</body>
+</html>

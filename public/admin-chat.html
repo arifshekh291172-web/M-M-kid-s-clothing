@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Support Panel | M&M Kid's Wear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/socket.io/socket.io.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Inter,system-ui;
+    background:#0f172a;
+    color:#fff;
+}
+
+/* HEADER */
+header{
+    padding:14px 20px;
+    background:#020617;
+    font-weight:700;
+    font-size:16px;
+}
+
+/* LAYOUT */
+.chat-layout{
+    display:grid;
+    grid-template-columns:300px 1fr;
+    height:calc(100vh - 52px);
+}
+
+/* TICKET LIST */
+.ticket-list{
+    background:#020617;
+    border-right:1px solid #1e293b;
+    overflow-y:auto;
+}
+
+.ticket{
+    padding:14px;
+    border-bottom:1px solid #1e293b;
+    cursor:pointer;
+}
+
+.ticket:hover,
+.ticket.active{
+    background:#1e293b;
+}
+
+.ticket small{
+    color:#94a3b8;
+    font-size:11px;
+}
+
+/* CHAT BOX */
+.chat-box{
+    display:flex;
+    flex-direction:column;
+}
+
+/* MESSAGES */
+.messages{
+    flex:1;
+    padding:20px;
+    overflow-y:auto;
+}
+
+.msg{
+    margin-bottom:12px;
+    max-width:70%;
+}
+
+.msg.user{
+    color:#a5b4fc;
+}
+
+.msg.admin{
+    color:#38bdf8;
+    margin-left:auto;
+    text-align:right;
+}
+
+.msg.ai{
+    color:#4ade80;
+}
+
+/* INPUT */
+.input-bar{
+    display:flex;
+    padding:12px;
+    background:#020617;
+    border-top:1px solid #1e293b;
+}
+
+.input-bar input{
+    flex:1;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    font-size:14px;
+}
+
+.input-bar button{
+    margin-left:10px;
+    padding:12px 18px;
+    border-radius:8px;
+    border:none;
+    background:#2563eb;
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>M&M Kid's Wear • Admin Live Support</header>
+
+<div class="chat-layout">
+    <!-- LEFT: TICKETS -->
+    <div class="ticket-list" id="ticketList"></div>
+
+    <!-- RIGHT: CHAT -->
+    <div class="chat-box">
+        <div class="messages" id="messages">
+            <p style="opacity:.5">Select a ticket to start chatting</p>
+        </div>
+
+        <div class="input-bar">
+            <input id="msgInput" placeholder="Type reply..." />
+            <button onclick="sendMsg()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const socket = io();
+let activeTicket = null;
+
+/* ============================
+   LOAD ALL TICKETS (ADMIN API)
+============================ */
+fetch("/api/admin/tickets")
+.then(res => res.json())
+.then(tickets => {
+    ticketList.innerHTML = tickets.map(t => `
+        <div class="ticket" onclick="openTicket('${t._id}', this)">
+            <b>${t.name}</b><br>
+            <small>${t.issueType} • ${t.status}</small>
+        </div>
+    `).join("");
+});
+
+/* ============================
+   OPEN TICKET CHAT
+============================ */
+function openTicket(ticketId, el){
+    activeTicket = ticketId;
+
+    document.querySelectorAll(".ticket").forEach(t => t.classList.remove("active"));
+    el.classList.add("active");
+
+    messages.innerHTML = "";
+
+    socket.emit("join_ticket", ticketId);
+
+    fetch("/api/admin/tickets/" + ticketId + "/messages")
+    .then(res => res.json())
+    .then(msgs => {
+        messages.innerHTML = msgs.map(m => `
+            <div class="msg ${m.sender}">
+                <b>${m.senderName || m.sender}:</b><br>
+                ${m.message}
+            </div>
+        `).join("");
+
+        messages.scrollTop = messages.scrollHeight;
+    });
+}
+
+/* ============================
+   SEND ADMIN MESSAGE
+============================ */
+function sendMsg(){
+    const text = msgInput.value.trim();
+    if(!text || !activeTicket) return;
+
+    socket.emit("admin_message", {
+        ticketId: activeTicket,
+        adminName: "Admin",
+        message: text
+    });
+
+    msgInput.value = "";
+}
+
+/* ============================
+   REALTIME RECEIVE
+============================ */
+socket.on("receive_message", data => {
+    if(data && data.sender && activeTicket){
+        const div = document.createElement("div");
+        div.className = "msg " + data.sender;
+        div.innerHTML = `<b>${data.senderName || data.sender}:</b><br>${data.message}`;
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
+});
+</script>
+<script src="/socket.io/socket.io.js"></script>
+
+</body>
+</html>

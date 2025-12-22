@@ -1,0 +1,171 @@
+/* ================================
+   VERIFY OTP – M&M Kid's Wear AUTH UI
+================================ */
+
+body {
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card */
+.auth-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  animation: fadeInUp 0.5s ease;
+}
+
+/* Title */
+.auth-container h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+/* Subtitle */
+.auth-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 25px;
+}
+
+/* OTP Input */
+#otp {
+  width: 100%;
+  padding: 14px;
+  font-size: 20px;
+  letter-spacing: 10px;
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  outline: none;
+  transition: all 0.25s ease;
+  margin-bottom: 20px;
+}
+
+#otp:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* Button */
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* Message */
+.auth-message {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+/* Success */
+.auth-message.success {
+  color: #16a34a;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 30px 22px;
+  }
+}
+/* =========================
+   OTP BOXES (6 DIGIT)
+========================= */
+.otp-boxes {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.otp-boxes input {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.otp-boxes input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* Shake animation */
+.otp-boxes.shake {
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+/* RESEND OTP */
+.resend {
+  margin-top: 16px;
+  font-size: 14px;
+  text-align: center;
+  color: #64748b;
+}
+
+.resend button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.resend button:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+.resend button:hover:not(:disabled) {
+  text-decoration: underline;
+}

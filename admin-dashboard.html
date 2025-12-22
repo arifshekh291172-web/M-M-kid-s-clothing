@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Admin Dashboard | M&M Kid's Wear</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter;
+            background: #f5f7fb;
+            color: #0f172a
+        }
+
+        header {
+            background: #0f172a;
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.green {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        header h1 {
+            font-size: 18px;
+            margin: 0
+        }
+
+        nav {
+            display: flex;
+            gap: 18px;
+            align-items: center
+        }
+
+        .navlink {
+            color: #cbd5f5;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .navlink:hover {
+            color: #fff;
+            text-decoration: underline
+        }
+
+        header button {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            min-height: calc(100vh - 56px)
+        }
+
+        aside {
+            background: #111827;
+            color: #cbd5f5;
+            padding: 16px
+        }
+
+        aside a {
+            display: block;
+            color: #cbd5f5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: pointer
+        }
+
+        aside a:hover,
+        aside a.active {
+            background: #1f2937;
+            color: #fff
+        }
+
+        main {
+            padding: 20px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .06)
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #64748b
+        }
+
+        .card p {
+            margin: 8px 0 0;
+            font-size: 26px;
+            font-weight: 700
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .06)
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px
+        }
+
+        th {
+            background: #f1f5f9;
+            text-align: left
+        }
+
+        tr:last-child td {
+            border-bottom: none
+        }
+
+        tr.product-row {
+            cursor: pointer
+        }
+
+        tr.product-row:hover {
+            background: #f8fafc
+        }
+
+        button.primary {
+            background: #2563eb;
+            color: #fff;
+            border: none
+        }
+
+        button.warn {
+            background: #f59e0b;
+            color: #fff;
+            border: none
+        }
+
+        button.danger {
+            background: #ef4444;
+            color: #fff;
+            border: none
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .right {
+            margin-left: auto
+        }
+
+        .section {
+            margin-top: 24px
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .muted {
+            color: #64748b
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>M&M Kid's Wear • Admin</h1>
+        <nav>
+            <span class="navlink" onclick="showSection('dash')">Dashboard</span>
+            <span class="navlink" onclick="showSection('users')">Users</span>
+            <span class="navlink" onclick="showSection('orders')">Orders</span>
+            <span class="navlink" onclick="showSection('products')">Products</span>
+            <span class="navlink" onclick="showSection('dash')">Analytics</span>
+            <span class="navlink" onclick="showSection('notifications')">Notifications</span>
+            <button onclick="logout()">Logout</button>
+        </nav>
+    </header>
+
+    <div class="layout">
+
+        <aside>
+            <a class="active" onclick="showSection('dash',this)">Dashboard</a>
+            <a onclick="showSection('users',this)">Users</a>
+            <a onclick="showSection('orders',this)">Orders</a>
+            <a onclick="showSection('products',this)">Products</a>
+            <a onclick="showSection('notifications',this)">Notifications</a>
+            <a href="/public/admin-chat.html">Live Chat</a>
+        </aside>
+
+        <main>
+
+            <!-- DASHBOARD -->
+            <section id="dash">
+                <div class="grid">
+                    <div class="card">
+                        <h3>Total Users</h3>
+                        <p id="statUsers">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Orders</h3>
+                        <p id="statOrders">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Revenue</h3>
+                        <p id="statRevenue">₹0</p>
+                    </div>
+                </div>
+
+                <div class="card section">
+                    <div class="row">
+                        <h3>Sales Analytics</h3>
+                        <select class="right" onchange="loadAnalytics(this.value)">
+                            <option value="daily">Daily</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <canvas id="salesChart" height="120"></canvas>
+                </div>
+            </section>
+
+            <!-- USERS -->
+            <section id="users" class="hidden">
+                <div class="row">
+                    <h2>Users</h2>
+                    <input class="right" placeholder="Search user..." onkeyup="filterTable(this,'usersTable')">
+                </div>
+                <table id="usersTable"></table>
+            </section>
+
+            <!-- ORDERS -->
+            <section id="orders" class="hidden">
+                <h2>Orders</h2>
+                <table id="ordersTable"></table>
+            </section>
+
+            <!-- PRODUCTS (ONLY THIS PART LOGIC CHANGED) -->
+            <section id="products" class="hidden">
+                <div class="row">
+                    <h2>Products</h2>
+
+                    <div class="right row">
+                        <input type="text" placeholder="Search product..."
+                            onkeyup="filterTable(this,'productsTable')" />
+                        <button class="primary" onclick="goAddProduct()">Add Product</button>
+                    </div>
+                </div>
+
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+
+
+            <!-- NOTIFICATIONS -->
+            <section id="notifications" class="hidden">
+                <h2>Notifications</h2>
+                <ul class="muted">
+                    <li>No new notifications</li>
+                </ul>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        const API = "http://localhost:5000";
+        const token = localStorage.getItem("adminToken");
+        if (!token) location.href = "admin-login.html";
+
+        /* NAV */
+        function showSection(id, el) {
+            document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
+            document.getElementById(id).classList.remove("hidden");
+            document.querySelectorAll("aside a").forEach(a => a.classList.remove("active"));
+            if (el) el.classList.add("active");
+        }
+
+        /* DASHBOARD */
+        let chart;
+        async function loadStats() {
+            const r = await fetch(API + "/api/admin/analytics", { headers: { Authorization: token } });
+            const d = await r.json();
+            statUsers.innerText = d.users || 0;
+            statOrders.innerText = d.orders || 0;
+            statRevenue.innerText = "₹" + (d.revenue || 0);
+        }
+
+        async function loadAnalytics(type) {
+            const r = await fetch(API + "/api/admin/analytics?type=" + type, { headers: { Authorization: token } });
+            const d = await r.json();
+            if (chart) chart.destroy();
+            chart = new Chart(salesChart, {
+                type: "line",
+                data: {
+                    labels: d.labels || [],
+                    datasets: [{
+                        label: "Sales ₹",
+                        data: d.data || [],
+                        borderColor: "#2563eb",
+                        backgroundColor: "rgba(37,99,235,.15)",
+                        fill: true
+                    }]
+                }
+            });
+        }
+
+        /* USERS / ORDERS CODE — SAME AS BEFORE */
+
+        async function loadUsers() {
+            const r = await fetch(API + "/api/admin/users", { headers: { Authorization: token } });
+            const users = await r.json();
+
+            const tbody = document.querySelector("#usersTable tbody");
+            tbody.innerHTML = users.map(u => `
+        <tr class="user-row">
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td>${u.phone || '—'}</td>
+            <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+        </tr>
+    `).join("");
+        }
+        /* ===============================
+           PRODUCTS
+        ================================ */
+        async function loadProducts() {
+            const r = await fetch(API + "/api/admin/products", {
+                headers: { Authorization: token }
+            });
+            const products = await r.json();
+
+            const tbody = document.querySelector("#productsTable tbody");
+
+            tbody.innerHTML = products.map(p => `
+        <tr>
+            <td>
+                <img 
+                    src="${p.image || 'https://via.placeholder.com/60'}"
+                    style="
+                        width:60px;
+                        height:60px;
+                        object-fit:cover;
+                        border-radius:10px;
+                        border:1px solid #e5e7eb;
+                    "
+                />
+            </td>
+            <td>
+                <strong>${p.name}</strong>
+                <div style="font-size:12px;color:#64748b">
+                    ${p.category || "—"}
+                </div>
+            </td>
+            <td>₹${p.price}</td>
+            <td>${p.stock}</td>
+            <td>
+                <span class="badge ${p.stock > 0 ? 'green' : 'red'}">
+                    ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                </span>
+            </td>
+            <td>
+                <div class="actions">
+                    <button class="primary" onclick="editProduct('${p._id}')">Edit</button>
+                    <button class="warn" onclick="viewProduct('${p._id}')">View</button>
+                    <button class="danger" onclick="deleteProduct('${p._id}')">Delete</button>
+                </div>
+            </td>
+        </tr>
+    `).join("");
+        }
+
+        /* ===============================
+           ACTION HANDLERS
+        ================================ */
+        function goAddProduct() {
+            location.href = "product.html";
+        }
+
+        function editProduct(id) {
+            location.href = "product.html?id=" + id;
+        }
+
+        function viewProduct(id) {
+            window.open("product-view.html?id=" + id, "_blank");
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm("Delete this product?")) return;
+
+            await fetch(API + "/api/admin/products/" + id, {
+                method: "DELETE",
+                headers: { Authorization: token }
+            });
+
+            loadProducts();
+        }
+
+
+
+        function openProduct(id) {
+            location.href = "product.html?id=" + id;
+        }
+
+        function goAddProduct() {
+            location.href = "product.html";
+        }
+
+        function deleteProduct(id) {
+            fetch(API + "/api/admin/products/" + id, {
+                method: "DELETE",
+                headers: { Authorization: token }
+            }).then(loadProducts);
+        }
+
+        function logout() {
+            localStorage.removeItem("adminToken");
+            location.href = "admin-login.html";
+        }
+
+        /* INIT */
+        loadStats();
+        loadAnalytics("daily");
+        loadUsers();
+        loadOrders();
+        loadProducts();
+    </script>
+
+</body>
+
+</html>

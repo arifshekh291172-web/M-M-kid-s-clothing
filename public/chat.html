@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Chat | StyleHub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+      background: #f1f5f9;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 420px;
+      height: 90vh;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    .chat-header {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-header span {
+      font-size: 28px;
+    }
+
+    .chat-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .chat-header p {
+      font-size: 12px;
+      opacity: .85;
+    }
+
+    /* MESSAGES */
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background: #f8fafc;
+    }
+
+    .msg {
+      max-width: 75%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .user {
+      margin-left: auto;
+      background: #2563eb;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bot {
+      background: #fff;
+      color: #0f172a;
+      border: 1px solid #e5e7eb;
+      border-bottom-left-radius: 4px;
+    }
+
+    /* INPUT */
+    .chat-input {
+      display: flex;
+      padding: 12px;
+      gap: 10px;
+      border-top: 1px solid #e5e7eb;
+      background: #fff;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5f5;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .chat-input button {
+      background: #2563eb;
+      border: none;
+      color: #fff;
+      padding: 0 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-input button:hover {
+      background: #1e40af;
+    }
+
+    .material-symbols-rounded {
+      font-size: 22px;
+    }
+
+    .typing {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="chat-container">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+      <span class="material-symbols-rounded">smart_toy</span>
+      <div>
+        <h3>StyleHub AI</h3>
+        <p>Ask anything about orders, products</p>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="chat-messages" id="chatBox">
+      <div class="msg bot">
+        👋 Hi! I’m your StyleHub AI assistant.
+        How can I help you today?
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Type your message..."
+        onkeydown="if(event.key==='Enter') sendMessage()" />
+      <button onclick="sendMessage()">
+        <span class="material-symbols-rounded">send</span>
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    /* ==============================
+       AUTH CHECK
+    ============================== */
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.replace("../login.html"); // root login.html
+      }
+    });
+
+    /* ==============================
+       CHAT LOGIC
+    ============================== */
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("userInput");
+
+    function addMessage(text, type) {
+      const div = document.createElement("div");
+      div.className = "msg " + type;
+      div.innerText = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      input.value = "";
+
+      const typing = document.createElement("div");
+      typing.className = "typing";
+      typing.innerText = "AI is typing...";
+      chatBox.appendChild(typing);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const res = await fetch("http://localhost:5000/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("token")
+          },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+        typing.remove();
+
+        addMessage(data.reply || "Sorry, I didn’t understand.", "bot");
+
+      } catch (err) {
+        typing.remove();
+        addMessage("⚠️ Server error. Please try again.", "bot");
+      }
+    }
+  </script>
+
+</body>
+
+</html>

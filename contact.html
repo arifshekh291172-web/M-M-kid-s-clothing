@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Customer Support | M&M Kid's Wear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        linear-gradient(rgba(2,6,23,.85), rgba(2,6,23,.85)),
+        url("https://images.unsplash.com/photo-1525182008055-f88b95ff7980");
+    background-size: cover;
+    background-position: center;
+    padding: 60px 20px;
+    color: #020617;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* HEADER */
+.page-header {
+    color: #fff;
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 36px;
+    margin-bottom: 6px;
+}
+
+.page-header p {
+    color: #cbd5f5;
+    max-width: 640px;
+}
+
+/* GRID */
+.support-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 28px;
+}
+
+/* INFO CARD */
+.support-info,
+.support-form {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 40px 90px rgba(0,0,0,.45);
+}
+
+.support-info h3,
+.support-form h3 {
+    margin-top: 0;
+    font-size: 22px;
+}
+
+.info-row {
+    display: flex;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row i {
+    font-size: 22px;
+    color: #2563eb;
+}
+
+.info-row strong {
+    display: block;
+    font-size: 14px;
+}
+
+.info-row span {
+    font-size: 13px;
+    color: #475569;
+}
+
+/* FORM */
+label {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    display: block;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.2);
+}
+
+button.submit-btn {
+    margin-top: 18px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg,#2563eb,#1e40af);
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .25s;
+}
+
+button.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px rgba(37,99,235,.45);
+}
+
+#msg {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #16a34a;
+    text-align: center;
+}
+
+/* WHATSAPP */
+.whatsapp-float {
+    position: fixed;
+    bottom: 26px;
+    right: 26px;
+    width: 60px;
+    height: 60px;
+    background: #25d366;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 25px 55px rgba(0,0,0,.45);
+    z-index: 9999;
+    transition: .25s;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.08);
+}
+
+/* LIVE CHAT */
+.chat-launcher {
+    position: fixed;
+    bottom: 26px;
+    right: 100px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg,#2563eb,#1e40af);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 25px 55px rgba(0,0,0,.45);
+    z-index: 9999;
+}
+
+.chat-widget {
+    position: fixed;
+    bottom: 100px;
+    right: 26px;
+    width: 340px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 50px 100px rgba(0,0,0,.5);
+    overflow: hidden;
+    display: none;
+    z-index: 9999;
+}
+
+.chat-header {
+    background: linear-gradient(135deg,#2563eb,#1e40af);
+    color: #fff;
+    padding: 14px 16px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-body {
+    padding: 14px;
+    height: 260px;
+    overflow-y: auto;
+    background: #f8fafc;
+}
+
+.bot-msg,
+.user-msg {
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    max-width: 80%;
+}
+
+.bot-msg {
+    background: #e5e7eb;
+}
+
+.user-msg {
+    background: #2563eb;
+    color: #fff;
+    margin-left: auto;
+}
+
+.chat-footer {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.chat-footer input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.chat-footer button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 0 14px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .support-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Customer Support</h1>
+        <p>
+            Need help with orders, payments, returns or technical issues?
+            Our support team is here to help you.
+        </p>
+    </div>
+
+    <div class="support-grid">
+
+        <div class="support-info">
+            <h3>Support Information</h3>
+
+            <div class="info-row">
+                <i class="fa-solid fa-envelope"></i>
+                <div>
+                    <strong>Email</strong>
+                    <span>support@M&M Kid's Wear.com</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <i class="fa-solid fa-phone"></i>
+                <div>
+                    <strong>Phone</strong>
+                    <span>+91 98765 43210</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <i class="fa-solid fa-clock"></i>
+                <div>
+                    <strong>Working Hours</strong>
+                    <span>Mon – Sat, 10 AM – 7 PM</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <i class="fa-brands fa-whatsapp"></i>
+                <div>
+                    <strong>WhatsApp</strong>
+                    <span>Fast support for urgent issues</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="support-form">
+            <h3>Submit a Request</h3>
+
+            <label>Full Name</label>
+            <input id="name">
+
+            <label>Email</label>
+            <input id="email" type="email">
+
+            <label>Issue Type</label>
+            <select id="type">
+                <option>Order Issue</option>
+                <option>Payment Problem</option>
+                <option>Return / Refund</option>
+                <option>Technical Issue</option>
+                <option>Other</option>
+            </select>
+
+            <label>Message</label>
+            <textarea id="message"></textarea>
+
+            <button class="submit-btn" onclick="sendMessage()">Submit</button>
+            <div id="msg"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- WhatsApp -->
+<a href="https://wa.me/919876543210?text=Hello%20M&M Kid's Wear%20Support"
+   class="whatsapp-float" target="_blank">
+   <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<!-- Live Chat -->
+<div class="chat-launcher" >
+    <a href="public/chat.html">
+        
+        <i class="fa-solid fa-comments"></i>
+
+    </a>
+</div>
+
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-header">
+        Live Support
+        <i class="fa-solid fa-xmark" onclick="toggleChat()"></i>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+        <div class="bot-msg">👋 Hi! How can we help you today?</div>
+    </div>
+
+    <div class="chat-footer">
+        <input id="chatInput" placeholder="Type message...">
+        <button onclick="sendChat()">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+function sendMessage() {
+    if (!name.value || !email.value || !message.value) {
+        alert("Please fill all required fields");
+        return;
+    }
+    msg.innerText = "Your request has been submitted successfully.";
+}
+
+function toggleChat() {
+    const chat = document.getElementById("chatWidget");
+    chat.style.display = chat.style.display === "block" ? "none" : "block";
+}
+
+function sendChat() {
+    const input = document.getElementById("chatInput");
+    if (!input.value) return;
+
+    chatBody.innerHTML += `<div class="user-msg">${input.value}</div>`;
+    input.value = "";
+
+    setTimeout(() => {
+        chatBody.innerHTML += `<div class="bot-msg">Our agent will reply shortly.</div>`;
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }, 800);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Profile | M&M Kid's Wear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter;
+  background:#f1f3f6;
+  color:#0f172a;
+}
+
+/* HEADER */
+header{
+  background:#2874f0;
+  color:#fff;
+  padding:14px 24px;
+  font-size:18px;
+  font-weight:600;
+}
+
+/* LAYOUT */
+.container{
+  max-width:1200px;
+  margin:20px auto;
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:20px;
+}
+
+/* SIDEBAR */
+.sidebar{
+  background:#fff;
+  border-radius:10px;
+  padding:16px;
+}
+.sidebar h3{
+  margin:0 0 10px;
+  font-size:15px;
+}
+.sidebar a{
+  display:block;
+  padding:10px 12px;
+  border-radius:6px;
+  text-decoration:none;
+  color:#111827;
+  font-size:14px;
+  margin-bottom:6px;
+  cursor:pointer;
+}
+.sidebar a.active,
+.sidebar a:hover{
+  background:#e8f0fe;
+  color:#2874f0;
+  font-weight:600;
+}
+
+/* CONTENT */
+.content{
+  background:#fff;
+  border-radius:10px;
+  padding:20px;
+}
+.section{display:none}
+.section.active{display:block}
+
+/* INFO CARD */
+.card{
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:16px;
+  margin-bottom:16px;
+}
+.card h4{
+  margin:0 0 10px;
+  font-size:15px;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  font-size:14px;
+}
+th{text-align:left;background:#f9fafb}
+
+/* BUTTONS */
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+}
+.primary{background:#2874f0;color:#fff}
+.danger{background:#ef4444;color:#fff}
+.muted{color:#6b7280}
+
+/* ADDRESS */
+.address{
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.address-actions{
+  margin-top:8px;
+  display:flex;
+  gap:8px;
+}
+
+/* WALLET */
+.wallet{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.balance{
+  font-size:24px;
+  font-weight:700;
+  color:#16a34a;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+  .container{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>My Account</header>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h3>Hello 👋</h3>
+    <a class="active" onclick="show('overview')">Profile Overview</a>
+    <a onclick="show('orders')">My Orders</a>
+    <a onclick="show('addresses')">Manage Addresses</a>
+    <a onclick="show('wallet')">Wallet</a>
+    <a onclick="show('security')">Change Password</a>
+    <a onclick="logout()">Logout</a>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section active">
+      <div class="card">
+        <h4>Personal Information</h4>
+        <p><strong>Name:</strong> <span id="name">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="email">Loading...</span></p>
+        <p><strong>Phone:</strong> <span id="phone">Not added</span></p>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section id="orders" class="section">
+      <h3>My Orders</h3>
+      <table id="ordersTable">
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </table>
+    </section>
+
+    <!-- ADDRESSES -->
+    <section id="addresses" class="section">
+      <h3>Saved Addresses</h3>
+      <div id="addressList"></div>
+      <button class="primary" onclick="addAddress()">+ Add New Address</button>
+    </section>
+
+    <!-- WALLET -->
+    <section id="wallet" class="section">
+      <div class="card wallet">
+        <div>
+          <h4>Wallet Balance</h4>
+          <div class="balance">₹<span id="walletBalance">0</span></div>
+        </div>
+      </div>
+
+      <h4>Transaction History</h4>
+      <table id="walletTable">
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Reason</th>
+        </tr>
+      </table>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="security" class="section">
+      <h3>Change Password</h3>
+      <div class="card">
+        <input type="password" id="oldPass" placeholder="Old Password"><br><br>
+        <input type="password" id="newPass" placeholder="New Password"><br><br>
+        <button class="primary" onclick="changePassword()">Update Password</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const API="http://localhost:5000";
+const token=localStorage.getItem("token");
+if(!token) location.href="login.html";
+
+/* SIDEBAR SWITCH */
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".sidebar a").forEach(a=>a.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
+/* LOAD PROFILE */
+async function loadProfile(){
+  const r=await fetch(API+"/api/auth/me",{headers:{Authorization:token}});
+  const u=await r.json();
+  name.innerText=u.name;
+  email.innerText=u.email;
+  phone.innerText=u.phone||"Not added";
+}
+
+/* LOAD ORDERS */
+async function loadOrders(){
+  const r=await fetch(API+"/api/orders/my",{headers:{Authorization:token}});
+  const o=await r.json();
+  ordersTable.innerHTML+=o.map(x=>`
+    <tr>
+      <td>${x._id}</td>
+      <td>${new Date(x.createdAt).toLocaleDateString()}</td>
+      <td>₹${x.totalAmount}</td>
+      <td>${x.status}</td>
+      <td><button onclick="viewOrder('${x._id}')">View</button></td>
+    </tr>
+  `).join("");
+}
+
+/* LOAD ADDRESSES */
+async function loadAddresses(){
+  const r=await fetch(API+"/api/checkout/address",{headers:{Authorization:token}});
+  const a=await r.json();
+  addressList.innerHTML=a.map(x=>`
+    <div class="address">
+      <strong>${x.name}</strong> (${x.phone})<br>
+      ${x.addressLine1}, ${x.city} - ${x.pincode}
+      <div class="address-actions">
+        <button onclick="editAddress('${x._id}')">Edit</button>
+        <button class="danger" onclick="deleteAddress('${x._id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* WALLET */
+async function loadWallet(){
+  const r=await fetch(API+"/api/wallet",{headers:{Authorization:token}});
+  const w=await r.json();
+  walletBalance.innerText=w.balance;
+  walletTable.innerHTML+=w.transactions.map(t=>`
+    <tr>
+      <td>${new Date(t.date).toLocaleDateString()}</td>
+      <td>${t.type}</td>
+      <td>₹${t.amount}</td>
+      <td>${t.reason}</td>
+    </tr>
+  `).join("");
+}
+
+/* ACTIONS */
+function viewOrder(id){ location.href="order-tracking.html?id="+id }
+function addAddress(){ alert("Open address modal") }
+function editAddress(id){ alert("Edit address "+id) }
+function deleteAddress(id){ alert("Delete address "+id) }
+function changePassword(){ alert("Password updated") }
+function logout(){
+  localStorage.removeItem("token");
+  location.href="login.html";
+}
+
+/* INIT */
+loadProfile();
+loadOrders();
+loadAddresses();
+loadWallet();
+</script>
+<script src="profile.js"></script>
+</body>
+</html>

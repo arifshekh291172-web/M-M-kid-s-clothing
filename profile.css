@@ -1,0 +1,123 @@
+* { box-sizing: border-box }
+body {
+  margin: 0;
+  font-family: Inter;
+  background: #f1f3f6;
+}
+
+.topbar {
+  background: #2874f0;
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.layout {
+  display: flex;
+  max-width: 1200px;
+  margin: 20px auto;
+  gap: 20px;
+}
+
+.sidebar {
+  width: 240px;
+  background: #fff;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.menu {
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.menu:hover,
+.menu.active {
+  background: #eaf1ff;
+  color: #2874f0;
+}
+.menu.logout {
+  color: #ef4444;
+}
+
+.content {
+  flex: 1;
+}
+
+.tab {
+  display: none;
+}
+.tab.active {
+  display: block;
+}
+
+.card, .wallet-box {
+  background: #fff;
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  padding: 8px 14px;
+  background: #2874f0;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button.secondary {
+  background: #e5e7eb;
+  color: #000;
+}
+
+.address-card, .order-card {
+  background: #fff;
+  padding: 14px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.wallet-box {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 20px;
+  width: 360px;
+  border-radius: 6px;
+}
+
+.modal-box input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.modal.show {
+  display: flex;
+}

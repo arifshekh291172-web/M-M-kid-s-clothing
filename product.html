@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Product | Admin</title>
+  <link rel="stylesheet" href="product.css">
+  <style>
+    .preview {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .preview img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Add New Product</h2>
+
+<div class="card">
+
+  <input id="name" placeholder="Product Name">
+  <input id="brand" placeholder="Brand">
+  <input id="category" placeholder="Category (men / women / shoes)">
+  <textarea id="description" placeholder="Description"></textarea>
+
+  <input id="price" type="number" placeholder="Selling Price">
+  <input id="originalPrice" type="number" placeholder="Original Price">
+  <input id="stock" type="number" placeholder="Stock">
+
+  <!-- FILE UPLOAD -->
+  <label>Main Image</label>
+  <input id="mainImage" type="file" accept="image/*">
+
+  <label>Extra Images</label>
+  <input id="extraImages" type="file" multiple accept="image/*">
+
+  <div class="preview" id="preview"></div>
+
+  <select id="badge">
+    <option value="">No Badge</option>
+    <option>New</option>
+    <option>Bestseller</option>
+    <option>Popular</option>
+    <option>Trending</option>
+    <option>Hot Deal</option>
+  </select>
+
+  <button onclick="addProduct()">Add Product</button>
+
+  <p id="msg"></p>
+</div>
+
+<script src="admin-add-product.js"></script>
+</body>
+</html>

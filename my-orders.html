@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter;background:#f5f7fb}
+header{background:#0f172a;color:#fff;padding:16px;font-size:18px}
+.container{max-width:900px;margin:20px auto}
+.card{background:#fff;padding:20px;border-radius:14px;margin-bottom:16px}
+.badge{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.Pending{background:#fde68a}
+.Shipped{background:#bfdbfe}
+.Delivered{background:#bbf7d0}
+</style>
+</head>
+<body>
+
+<header>My Orders</header>
+<div class="container" id="orders"></div>
+
+<script>
+const API="http://localhost:5000";
+const token=localStorage.getItem("token");
+if(!token) location.href="login.html";
+
+async function loadOrders(){
+  const res=await fetch(API+"/api/orders/my",{headers:{Authorization:token}});
+  const orders=await res.json();
+
+  orders.innerHTML="";
+  orders.forEach(o=>{
+    ordersDiv.innerHTML+=`
+      <div class="card">
+        <strong>Order #${o._id.slice(-6)}</strong>
+        <span class="badge ${o.status}">${o.status}</span>
+        <p>${o.items.map(i=>`${i.name} × ${i.quantity}`).join("<br>")}</p>
+        <strong>Total: ₹${o.totalAmount}</strong>
+      </div>`;
+  });
+}
+loadOrders();
+</script>
+
+</body>
+</html>

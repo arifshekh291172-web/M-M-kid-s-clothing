@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Order Panel | M&M Kid's Wear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:Inter;
+  background:#f1f5f9;
+  color:#0f172a;
+}
+header{
+  background:#020617;
+  color:#fff;
+  padding:18px 24px;
+  font-size:18px;
+  font-weight:700;
+}
+.container{
+  max-width:1100px;
+  margin:20px auto;
+  padding:0 16px;
+}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+}
+h2{margin-top:0}
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.badge{
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
+  background:#e5e7eb;
+}
+select,input,textarea,button{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  font-family:inherit;
+}
+button{
+  background:#2563eb;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
+.timeline{
+  border-left:3px solid #e5e7eb;
+  padding-left:16px;
+}
+.step{
+  margin-bottom:14px;
+}
+.step strong{display:block}
+small{color:#64748b}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+}
+th{background:#f8fafc;text-align:left}
+</style>
+</head>
+
+<body>
+
+<header>Admin Order Management</header>
+
+<div class="container">
+
+  <!-- ORDER INFO -->
+  <div class="card">
+    <h2>Order Info</h2>
+    <div class="row">
+      <div>
+        <strong>Order ID:</strong>
+        <div id="orderId"></div>
+      </div>
+      <div>
+        <strong>Status:</strong>
+        <span class="badge" id="orderStatus"></span>
+      </div>
+      <div>
+        <strong>Payment:</strong>
+        <div id="payment"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER + ADDRESS -->
+  <div class="card">
+    <h2>User & Address</h2>
+    <p id="userInfo"></p>
+    <p id="address"></p>
+  </div>
+
+  <!-- ITEMS -->
+  <div class="card">
+    <h2>Order Items</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody id="items"></tbody>
+    </table>
+  </div>
+
+  <!-- STATUS UPDATE -->
+  <div class="card">
+    <h2>Update Order Status</h2>
+
+    <select id="status">
+      <option>Pending</option>
+      <option>Packed</option>
+      <option>Shipped</option>
+      <option>Out for Delivery</option>
+      <option>Delivered</option>
+      <option>Cancelled</option>
+      <option>Refund Requested</option>
+      <option>Refunded</option>
+    </select>
+
+    <br><br>
+
+    <input id="courierName" placeholder="Courier Name (Delhivery, Bluedart)">
+    <input id="trackingUrl" placeholder="Courier Tracking URL">
+
+    <br><br>
+
+    <textarea id="adminNote" placeholder="Admin Note (optional)"></textarea>
+
+    <br><br>
+
+    <button onclick="updateStatus()">Update Status</button>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="card">
+    <h2>Status Timeline</h2>
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+</div>
+
+<script>
+const API="http://localhost:5000";
+const adminToken=localStorage.getItem("adminToken");
+const orderIdParam=new URLSearchParams(location.search).get("id");
+
+if(!adminToken) location.href="admin-login.html";
+
+async function loadOrder(){
+  const res=await fetch(API+"/api/admin/orders/"+orderIdParam,{
+    headers:{Authorization:adminToken}
+  });
+  const o=await res.json();
+
+  orderId.innerText=o._id;
+  orderStatus.innerText=o.status;
+  payment.innerText=o.paymentMethod+" / "+o.paymentStatus;
+
+  userInfo.innerHTML=`<strong>${o.userId.name}</strong><br>${o.userId.email}`;
+
+  address.innerHTML=`
+    ${o.shippingAddress.name}<br>
+    ${o.shippingAddress.phone}<br>
+    ${o.shippingAddress.addressLine1}, ${o.shippingAddress.city}
+  `;
+
+  items.innerHTML="";
+  o.items.forEach(i=>{
+    items.innerHTML+=`
+      <tr>
+        <td>${i.name}</td>
+        <td>${i.quantity}</td>
+        <td>₹${i.price}</td>
+      </tr>`;
+  });
+
+  timeline.innerHTML="";
+  o.statusHistory.forEach(s=>{
+    timeline.innerHTML+=`
+      <div class="step">
+        <strong>${s.status}</strong>
+        <small>${new Date(s.date).toLocaleString()}</small>
+      </div>`;
+  });
+}
+
+async function updateStatus(){
+  const body={
+    status:status.value,
+    courier:{
+      name:courierName.value,
+      trackingUrl:trackingUrl.value
+    },
+    adminNote:adminNote.value
+  };
+
+  await fetch(API+"/api/admin/order/status/"+orderIdParam,{
+    method:"PUT",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:adminToken
+    },
+    body:JSON.stringify(body)
+  });
+
+  alert("Order updated");
+  loadOrder();
+}
+
+loadOrder();
+</script>
+
+</body>
+</html>

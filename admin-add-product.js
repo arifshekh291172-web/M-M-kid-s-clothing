@@ -70,7 +70,7 @@ async function addProduct() {
       formData.append("images", file);
     });
 
-    const res = await fetch("http://localhost:5000/api/admin/products", {
+    const res = await fetch("https://m-m-kid-s-clothing.onrender.com/api/admin/products", {
       method: "POST",
       headers: {
         Authorization: token

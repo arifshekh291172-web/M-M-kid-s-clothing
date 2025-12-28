@@ -1,7 +1,7 @@
 /* =========================================
    CONFIG
 ========================================= */
-const API = "http://localhost:5000";
+const API = "https://m-m-kid-s-clothing.onrender.com";
 const token = localStorage.getItem("token");
 
 if (!token) {

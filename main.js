@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 ========================================= */
 async function loadProducts() {
   try {
-    const res = await fetch("http://localhost:5000/api/products");
+    const res = await fetch("https://m-m-kid-s-clothing.onrender.com/api/products");
     const data = await res.json();
 
     products = data.products || data;
@@ -233,7 +233,7 @@ async function toggleWishlist(productId) {
     return;
   }
 
-  await fetch("http://localhost:5000/api/wishlist/toggle", {
+  await fetch("https://m-m-kid-s-clothing.onrender.com/api/wishlist/toggle", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

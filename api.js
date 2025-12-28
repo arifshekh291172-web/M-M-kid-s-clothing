@@ -1,5 +1,5 @@
 // public/js/api.js
-const BACKEND = "http://localhost:5000";
+const BACKEND = "https://m-m-kid-s-clothing.onrender.com";
 
 function API(path, options = {}) {
   return fetch(`${BACKEND}${path}`, {

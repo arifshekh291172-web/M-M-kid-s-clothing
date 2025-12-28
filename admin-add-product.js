@@ -39,13 +39,21 @@ function showPreview(files) {
 /* ===== ADD PRODUCT ===== */
 async function addProduct() {
   const token = localStorage.getItem("adminToken");
+
   if (!token) {
     alert("❌ Admin login required");
     return;
   }
 
-  if (!name.value || !price.value || !stock.value || mainImage.files.length === 0) {
-    msg.innerText = "❌ Please fill required fields";
+  if (
+    !name.value ||
+    !brand.value ||
+    !category.value ||
+    !price.value ||
+    !originalPrice.value ||
+    mainImage.files.length === 0
+  ) {
+    msg.innerText = "❌ Please fill all required fields";
     msg.style.color = "red";
     return;
   }
@@ -58,35 +66,37 @@ async function addProduct() {
     formData.append("category", category.value.trim());
     formData.append("description", description.value.trim());
     formData.append("price", price.value);
-    formData.append("originalPrice", originalPrice.value || 0);
-    formData.append("stock", stock.value);
-    formData.append("badge", badge.value);
+    formData.append("originalPrice", originalPrice.value);
+    formData.append("stock", stock.value || 0);
+    formData.append("badge", badge.value || "");
 
-    // Main image
+    // Main image (required)
     formData.append("image", mainImage.files[0]);
 
-    // Extra images
+    // Extra images (optional)
     Array.from(extraImages.files).forEach(file => {
       formData.append("images", file);
     });
 
-    const res = await fetch("https://m-m-kid-s-clothing.onrender.com/api/admin/products", {
-      method: "POST",
-      headers: {
-        Authorization: token
-        // ❌ Content-Type MAT DO (FormData khud set karta hai)
-      },
-      body: formData
-    });
+    const res = await fetch(
+      "https://m-m-kid-s-clothing.onrender.com/api/admin/products",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}` // ✅ YAHI ERROR THA
+        },
+        body: formData
+      }
+    );
 
     const result = await res.json();
 
-    if (result.success) {
+    if (res.ok) {
       msg.innerText = "✅ Product added successfully";
       msg.style.color = "green";
       clearForm();
     } else {
-      msg.innerText = result.message || "❌ Failed";
+      msg.innerText = result.message || "❌ Failed to add product";
       msg.style.color = "red";
     }
 
@@ -106,8 +116,8 @@ function clearForm() {
   price.value = "";
   originalPrice.value = "";
   stock.value = "";
+  badge.value = "";
   mainImage.value = "";
   extraImages.value = "";
-  badge.value = "";
   preview.innerHTML = "";
 }

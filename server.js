@@ -22,9 +22,11 @@ const server = http.createServer(app);
 connectDB();
 
 /* ======================================================
-   MIDDLEWARES
+   GLOBAL MIDDLEWARES  🔥 MOST IMPORTANT
 ====================================================== */
 app.use(cors({ origin: "*" }));
+
+// 🔴 YAHI LINE MISSING / PROBLEM THI
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -41,7 +43,7 @@ const io = new Server(server, {
 });
 
 /* ======================================================
-   API ROUTES
+   API ROUTES (AFTER BODY PARSER)
 ====================================================== */
 
 // USER
@@ -51,7 +53,6 @@ app.use("/api/cart", require("./routes/cartRoutes"));
 app.use("/api/checkout", require("./routes/checkoutRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
-// app.use("/api/payment", require("./routes/paymentRoutes")); // 🔥 PAYMENT
 
 // ADMIN
 app.use("/api/admin/auth", require("./routes/adminAuthRoutes"));
@@ -61,7 +62,7 @@ app.use("/api/admin", require("./routes/adminRoutes"));
    HEALTH CHECK
 ====================================================== */
 app.get("/", (req, res) => {
-  res.send("✅ M&M Kid's Wear Backend + Payment + Live Chat Running");
+  res.send("✅ M&M Kid's Wear Backend Running");
 });
 
 /* ======================================================
@@ -175,81 +176,6 @@ app.post("/api/support/ticket", async (req, res) => {
     });
   }
 });
-
-/* ======================================================
-   ADMIN SUPPORT APIs
-====================================================== */
-app.get("/api/admin/tickets", async (req, res) => {
-  const tickets = await Ticket.find().sort({ createdAt: -1 });
-  res.json(tickets);
-});
-
-app.get("/api/admin/tickets/:id/messages", async (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.json([]);
-  }
-
-  const messages = await Message.find({
-    ticket: req.params.id
-  }).sort({ createdAt: 1 });
-
-  res.json(messages);
-});
-
-/* ======================================================
-   RAZORPAY WEBHOOK (AUTO CONFIRM PAYMENT)
-====================================================== */
-app.post(
-  "/api/payment/webhook",
-  express.raw({ type: "application/json" }),
-  async (req, res) => {
-    try {
-      const crypto = require("crypto");
-      const Payment = require("./models/Payment");
-      const Order = require("./models/Order");
-
-      const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-      const signature = req.headers["x-razorpay-signature"];
-
-      const expectedSignature = crypto
-        .createHmac("sha256", secret)
-        .update(req.body)
-        .digest("hex");
-
-      if (expectedSignature !== signature) {
-        return res.status(400).send("Invalid signature");
-      }
-
-      const event = JSON.parse(req.body);
-
-      if (event.event === "payment.captured") {
-        const paymentId = event.payload.payment.entity.id;
-        const orderId = event.payload.payment.entity.order_id;
-
-        await Payment.findOneAndUpdate(
-          { razorpayOrderId: orderId },
-          {
-            razorpayPaymentId: paymentId,
-            status: "PAID"
-          }
-        );
-
-        await Order.findOneAndUpdate(
-          { paymentId },
-          {
-            paymentStatus: "Paid",
-            status: "Packed"
-          }
-        );
-      }
-
-      res.json({ status: "ok" });
-    } catch (err) {
-      console.error("WEBHOOK ERROR:", err);
-      res.status(500).send("Webhook error");
-    }
-  }
-);
 
 /* ======================================================
    404 HANDLER

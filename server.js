@@ -51,7 +51,7 @@ app.use("/api/cart", require("./routes/cartRoutes"));
 app.use("/api/checkout", require("./routes/checkoutRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
-app.use("/api/payment", require("./routes/paymentRoutes")); // 🔥 PAYMENT
+// app.use("/api/payment", require("./routes/paymentRoutes")); // 🔥 PAYMENT
 
 // ADMIN
 app.use("/api/admin/auth", require("./routes/adminAuthRoutes"));

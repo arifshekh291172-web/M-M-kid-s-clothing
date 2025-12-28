@@ -100,8 +100,10 @@ const productSchema = new mongoose.Schema(
 
 /* ======================================================
    AUTO CALCULATE DISCOUNT %
+   ❌ NO async
+   ❌ NO next()
 ====================================================== */
-productSchema.pre("save", function (next) {
+productSchema.pre("save", function () {
   if (
     this.originalPrice &&
     this.price &&
@@ -113,7 +115,6 @@ productSchema.pre("save", function (next) {
   } else {
     this.discount = 0;
   }
-  next();
 });
 
 /* ======================================================

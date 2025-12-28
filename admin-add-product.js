@@ -1,84 +1,136 @@
-const express = require("express");
-const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const adminAuth = require("../middleware/adminAuth");
-const Product = require("../models/Product");
-
-const router = express.Router();
-
-/* CLOUDINARY CONFIG */
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-/* MULTER (MEMORY STORAGE) */
-const upload = multer({ storage: multer.memoryStorage() });
-
 /* ===============================
-   ADD PRODUCT (REAL)
+   ADMIN ADD PRODUCT (FILE UPLOAD)
+   REAL VERSION – FormData + Images
 ================================ */
-router.post(
-  "/products",
-  adminAuth,
-  upload.fields([
-    { name: "image", maxCount: 1 },
-    { name: "images", maxCount: 5 }
-  ]),
-  async (req, res) => {
-    try {
-      const {
-        name,
-        brand,
-        category,
-        description,
-        price,
-        originalPrice,
-        stock,
-        badge
-      } = req.body;
 
-      if (!req.files || !req.files.image) {
-        return res.status(400).json({ message: "Main image required" });
-      }
+/* ===== GET ELEMENTS ===== */
+const name = document.getElementById("name");
+const brand = document.getElementById("brand");
+const category = document.getElementById("category");
+const description = document.getElementById("description");
+const price = document.getElementById("price");
+const originalPrice = document.getElementById("originalPrice");
+const stock = document.getElementById("stock");
 
-      /* UPLOAD MAIN IMAGE */
-      const main = await cloudinary.uploader.upload(
-        `data:${req.files.image[0].mimetype};base64,${req.files.image[0].buffer.toString("base64")}`
-      );
+const mainImage = document.getElementById("mainImage");
+const extraImages = document.getElementById("extraImages");
 
-      /* EXTRA IMAGES */
-      const extras = [];
-      if (req.files.images) {
-        for (let file of req.files.images) {
-          const up = await cloudinary.uploader.upload(
-            `data:${file.mimetype};base64,${file.buffer.toString("base64")}`
-          );
-          extras.push(up.secure_url);
-        }
-      }
+const badge = document.getElementById("badge");
+const msg = document.getElementById("msg");
+const preview = document.getElementById("preview");
 
-      const product = await Product.create({
-        name,
-        brand,
-        category,
-        description,
-        price: Number(price),
-        originalPrice: Number(originalPrice),
-        stock: Number(stock || 0),
-        badge: badge || "",
-        image: main.secure_url,
-        images: extras
-      });
+/* ===== IMAGE PREVIEW ===== */
+if (mainImage) {
+  mainImage.addEventListener("change", () => {
+    preview.innerHTML = "";
+    showPreview(mainImage.files);
+  });
+}
 
-      res.json({ success: true, product });
+if (extraImages) {
+  extraImages.addEventListener("change", () => {
+    showPreview(extraImages.files);
+  });
+}
 
-    } catch (err) {
-      console.error("ADD PRODUCT ERROR:", err);
-      res.status(500).json({ message: err.message });
-    }
+function showPreview(files) {
+  Array.from(files).forEach(file => {
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.style.width = "80px";
+    img.style.height = "80px";
+    img.style.objectFit = "cover";
+    img.style.margin = "4px";
+    preview.appendChild(img);
+  });
+}
+
+/* ===== ADD PRODUCT ===== */
+async function addProduct() {
+  const token = localStorage.getItem("adminToken");
+
+  if (!token) {
+    alert("❌ Admin login required");
+    return;
   }
-);
 
-module.exports = router;
+  // Basic validation
+  if (
+    !name.value ||
+    !brand.value ||
+    !category.value ||
+    !price.value ||
+    !originalPrice.value ||
+    !mainImage.files.length
+  ) {
+    msg.innerText = "❌ Please fill all required fields";
+    msg.style.color = "red";
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+
+    // TEXT FIELDS
+    formData.append("name", name.value.trim());
+    formData.append("brand", brand.value.trim());
+    formData.append("category", category.value.trim());
+    formData.append("description", description.value.trim());
+    formData.append("price", price.value);
+    formData.append("originalPrice", originalPrice.value);
+    formData.append("stock", stock.value || 0);
+    formData.append("badge", badge.value || "");
+
+    // MAIN IMAGE (REQUIRED)
+    formData.append("image", mainImage.files[0]);
+
+    // EXTRA IMAGES (OPTIONAL)
+    Array.from(extraImages.files).forEach(file => {
+      formData.append("images", file);
+    });
+
+    const res = await fetch(
+      "https://m-m-kid-s-clothing.onrender.com/api/admin/products",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}` // ✅ VERY IMPORTANT
+          // ❌ Content-Type mat do (browser khud set karega)
+        },
+        body: formData
+      }
+    );
+
+    const result = await res.json();
+
+    if (res.ok) {
+      msg.innerText = "✅ Product added successfully";
+      msg.style.color = "green";
+      clearForm();
+    } else {
+      msg.innerText = result.message || "❌ Failed to add product";
+      msg.style.color = "red";
+    }
+
+  } catch (err) {
+    console.error("ADD PRODUCT ERROR:", err);
+    msg.innerText = "❌ Server error";
+    msg.style.color = "red";
+  }
+}
+
+/* ===== CLEAR FORM ===== */
+function clearForm() {
+  name.value = "";
+  brand.value = "";
+  category.value = "";
+  description.value = "";
+  price.value = "";
+  originalPrice.value = "";
+  stock.value = "";
+  badge.value = "";
+
+  if (mainImage) mainImage.value = "";
+  if (extraImages) extraImages.value = "";
+  if (preview) preview.innerHTML = "";
+}

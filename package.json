@@ -13,6 +13,7 @@
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
@@ -20,6 +21,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.1",
     "moongose": "^1.0.0",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.11",
     "openai": "^6.10.0",
     "pdfkit": "^0.17.2",

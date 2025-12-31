@@ -144,8 +144,8 @@ router.post("/products", adminAuth, async (req, res) => {
       originalPrice,
       sizes,
       badge,
-      mainImage,     // frontend se aata hai
-      extraImages    // frontend se aata hai
+      image,     // ✅ frontend se aa raha
+      images     // ✅ frontend se aa raha
     } = req.body;
 
     if (!name || !category || !price) {
@@ -155,7 +155,8 @@ router.post("/products", adminAuth, async (req, res) => {
       });
     }
 
-    if (!mainImage || !mainImage.startsWith("data:image")) {
+    // ✅ CORRECT IMAGE CHECK
+    if (!image || !image.startsWith("data:image")) {
       return res.status(400).json({
         success: false,
         message: "Main image required"
@@ -171,8 +172,8 @@ router.post("/products", adminAuth, async (req, res) => {
       originalPrice: Number(originalPrice) || 0,
       sizes: sizes || [],
       badge: badge || "",
-      image: image,           // DB field
-      images: images || [],  // DB field
+      image: image,          // ✅ save main image
+      images: images || [],  // ✅ save extra images
       isActive: true
     });
 
@@ -181,7 +182,7 @@ router.post("/products", adminAuth, async (req, res) => {
       product
     });
   } catch (err) {
-    console.error("ADD PRODUCT ERROR:", err.message);
+    console.error("ADD PRODUCT ERROR:", err);
     res.status(500).json({
       success: false,
       message: err.message

@@ -27,8 +27,7 @@ connectDB();
 ====================================================== */
 app.use(cors({ origin: "*" }));
 
-// 🔥🔥 BASE64 IMAGE SUPPORT (THIS WAS THE MAIN ISSUE)
-// 10mb kabhi-kabhi kam padta hai → 25mb safe hai
+// 🔥 BASE64 IMAGE SUPPORT
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
@@ -67,9 +66,9 @@ app.use("/api/checkout", require("./routes/checkoutRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
 
-// 🔹 ADMIN (IMPORTANT)
+// 🔹 ADMIN (IMPORTANT – FIXED)
 app.use("/api/admin/auth", require("./routes/adminAuthRoutes"));
-app.use("/api/admin", require("./routes/productRoutes")); // 🔥 FIXED
+app.use("/api/admin", require("./routes/adminRoutes")); // ✅ CORRECT
 
 /* ======================================================
    SOCKET.IO – LIVE CHAT
@@ -113,7 +112,6 @@ io.on("connection", socket => {
         senderName: "M&M Kid's Wear AI",
         message: aiReply
       });
-
     } catch (err) {
       console.error("CHAT ERROR:", err);
     }
@@ -173,7 +171,6 @@ app.post("/api/support/ticket", async (req, res) => {
       success: true,
       ticketId: ticket._id
     });
-
   } catch (err) {
     console.error("SUPPORT ERROR:", err);
     res.status(500).json({

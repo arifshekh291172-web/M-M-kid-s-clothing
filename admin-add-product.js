@@ -2,101 +2,102 @@
    ADMIN ADD PRODUCT (BASE64)
 ================================ */
 
-/* ===== GET ELEMENTS ===== */
-const name = document.getElementById("name");
-const brand = document.getElementById("brand");
-const category = document.getElementById("category");
-const description = document.getElementById("description");
-const price = document.getElementById("price");
-const originalPrice = document.getElementById("originalPrice");
-const badge = document.getElementById("badge");
+/* ===== ELEMENTS ===== */
+const el = id => document.getElementById(id);
 
-const mainImage = document.getElementById("mainImage");
-const extraImages = document.getElementById("extraImages");
+const nameEl = el("name");
+const brandEl = el("brand");
+const categoryEl = el("category");
+const descriptionEl = el("description");
+const priceEl = el("price");
+const originalPriceEl = el("originalPrice");
+const badgeEl = el("badge");
 
-const msg = document.getElementById("msg");
-const preview = document.getElementById("preview");
+const mainImageEl = el("mainImage");
+const extraImagesEl = el("extraImages");
+
+const msgEl = el("msg");
+const previewEl = el("preview");
 
 /* ===== SIZE INPUTS ===== */
 const sizeInputs = [
-  { label: "1Y-2Y", el: document.getElementById("size-1") },
-  { label: "2Y-3Y", el: document.getElementById("size-2") },
-  { label: "3Y-4Y", el: document.getElementById("size-3") },
-  { label: "4Y-5Y", el: document.getElementById("size-4") },
-  { label: "5Y-6Y", el: document.getElementById("size-5") }
+  { label: "1Y-2Y", el: el("size-1") },
+  { label: "2Y-3Y", el: el("size-2") },
+  { label: "3Y-4Y", el: el("size-3") },
+  { label: "4Y-5Y", el: el("size-4") },
+  { label: "5Y-6Y", el: el("size-5") }
 ];
 
-/* ===== IMAGE PREVIEW ===== */
-if (mainImage) {
-  mainImage.addEventListener("change", () => {
-    preview.innerHTML = "";
-    showPreview(mainImage.files);
-  });
-}
+/* ===============================
+   IMAGE PREVIEW
+================================ */
+mainImageEl?.addEventListener("change", () => {
+  previewEl.innerHTML = "";
+  showPreview(mainImageEl.files);
+});
 
-if (extraImages) {
-  extraImages.addEventListener("change", () => {
-    showPreview(extraImages.files);
-  });
-}
+extraImagesEl?.addEventListener("change", () => {
+  showPreview(extraImagesEl.files);
+});
 
 function showPreview(files) {
+  if (!files) return;
   Array.from(files).forEach(file => {
     const img = document.createElement("img");
     img.src = URL.createObjectURL(file);
-    img.style.width = "90px";
-    img.style.height = "90px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
-    preview.appendChild(img);
+    img.style.cssText =
+      "width:90px;height:90px;object-fit:cover;border-radius:8px;margin-right:6px;";
+    previewEl.appendChild(img);
   });
 }
 
-/* ===== BASE64 CONVERTER ===== */
+/* ===============================
+   BASE64 CONVERTER
+================================ */
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
-    reader.onerror = err => reject(err);
+    reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 }
 
-/* ===== ADD PRODUCT ===== */
-async function addProduct() {
-  msg.innerText = "";
+/* ===============================
+   ADD PRODUCT
+================================ */
+let submitting = false;
 
+async function addProduct() {
+  if (submitting) return;
+  msgEl.innerText = "";
+
+  /* ===== ADMIN AUTH ===== */
   const token = localStorage.getItem("adminToken");
   if (!token) {
-    alert("Admin login required");
+    alert("❌ Admin login required");
+    location.href = "admin-login.html";
     return;
   }
 
   /* ===== BASIC VALIDATION ===== */
   if (
-    !name.value ||
-    !brand.value ||
-    !category.value ||
-    !price.value ||
-    !originalPrice.value
+    !nameEl.value ||
+    !brandEl.value ||
+    !categoryEl.value ||
+    !priceEl.value ||
+    !originalPriceEl.value
   ) {
-    msg.innerText = "❌ Please fill all required fields";
-    msg.style.color = "red";
+    showError("Please fill all required fields");
     return;
   }
 
-  /* ===== IMAGE VALIDATION ===== */
-  if (!mainImage || !mainImage.files || mainImage.files.length === 0) {
-    msg.innerText = "❌ Please select main image";
-    msg.style.color = "red";
-    console.error("MAIN IMAGE FILE:", mainImage?.files?.[0]);
+  if (!mainImageEl?.files?.length) {
+    showError("Please select a main image");
     return;
   }
 
-  const mainFile = mainImage.files[0];
-  console.log("MAIN IMAGE FILE:", mainFile);
-
-  /* ===== SIZE-WISE STOCK ===== */
+  /* ===== SIZE STOCK ===== */
   const sizes = sizeInputs
     .map(s => ({
       label: s.label,
@@ -105,40 +106,47 @@ async function addProduct() {
     .filter(s => s.stock > 0);
 
   if (!sizes.length) {
-    msg.innerText = "❌ Please enter stock for at least one size";
-    msg.style.color = "red";
+    showError("Enter stock for at least one size");
     return;
   }
 
+  submitting = true;
+
   try {
-    /* ===== CONVERT IMAGES TO BASE64 ===== */
-    const mainBase64 = await toBase64(mainFile);
-    console.log("MAIN IMAGE BASE64:", mainBase64.substring(0, 40));
+    /* ===== BASE64 CONVERSION ===== */
+    const mainBase64 = await toBase64(mainImageEl.files[0]);
+
+    // Safety: very large image check (≈5MB base64)
+    if (mainBase64.length > 7_000_000) {
+      showError("Main image is too large. Please use a smaller image.");
+      submitting = false;
+      return;
+    }
 
     const extraBase64 = [];
-    if (extraImages && extraImages.files.length > 0) {
-      for (const file of extraImages.files) {
+    if (extraImagesEl?.files?.length) {
+      for (const file of extraImagesEl.files) {
         extraBase64.push(await toBase64(file));
       }
     }
 
-    /* ===== BUILD BODY ===== */
+    /* ===== REQUEST BODY ===== */
     const body = {
-      name: name.value.trim(),
-      brand: brand.value.trim(),
-      category: category.value.trim(),
-      description: description.value.trim(),
-      price: Number(price.value),
-      originalPrice: Number(originalPrice.value),
-      badge: badge.value || "",
+      name: nameEl.value.trim(),
+      brand: brandEl.value.trim(),
+      category: categoryEl.value.trim(),
+      description: descriptionEl.value.trim(),
+      price: Number(priceEl.value),
+      originalPrice: Number(originalPriceEl.value),
+      badge: badgeEl.value || "",
       sizes,
-      image: mainBase64,     // 🔥 REQUIRED
+      image: mainBase64,
       images: extraBase64
     };
 
-    console.log("FINAL BODY SENT:", {
+    console.log("ADD PRODUCT BODY:", {
       ...body,
-      image: body.image.substring(0, 30)
+      image: body.image.substring(0, 40) + "..."
     });
 
     /* ===== API CALL ===== */
@@ -157,37 +165,48 @@ async function addProduct() {
     const result = await res.json();
 
     if (res.ok && result.success) {
-      msg.innerText = "✅ Product added successfully";
-      msg.style.color = "green";
+      showSuccess("Product added successfully");
       clearForm();
     } else {
-      msg.innerText = result.message || "❌ Failed to add product";
-      msg.style.color = "red";
+      showError(result.message || "Failed to add product");
       console.error("SERVER RESPONSE:", result);
     }
 
   } catch (err) {
     console.error("ADD PRODUCT ERROR:", err);
-    msg.innerText = "❌ Server error";
-    msg.style.color = "red";
+    showError("Server error");
+  } finally {
+    submitting = false;
   }
 }
 
-/* ===== CLEAR FORM ===== */
+/* ===============================
+   UI HELPERS
+================================ */
+function showError(text) {
+  msgEl.innerText = "❌ " + text;
+  msgEl.style.color = "red";
+}
+
+function showSuccess(text) {
+  msgEl.innerText = "✅ " + text;
+  msgEl.style.color = "green";
+}
+
+/* ===============================
+   CLEAR FORM
+================================ */
 function clearForm() {
-  name.value = "";
-  brand.value = "";
-  category.value = "";
-  description.value = "";
-  price.value = "";
-  originalPrice.value = "";
-  badge.value = "";
+  nameEl.value = "";
+  brandEl.value = "";
+  categoryEl.value = "";
+  descriptionEl.value = "";
+  priceEl.value = "";
+  originalPriceEl.value = "";
+  badgeEl.value = "";
 
-  sizeInputs.forEach(s => {
-    if (s.el) s.el.value = "";
-  });
-
-  if (mainImage) mainImage.value = "";
-  if (extraImages) extraImages.value = "";
-  if (preview) preview.innerHTML = "";
+  sizeInputs.forEach(s => s.el && (s.el.value = ""));
+  mainImageEl.value = "";
+  extraImagesEl.value = "";
+  previewEl.innerHTML = "";
 }

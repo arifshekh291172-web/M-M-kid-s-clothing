@@ -172,7 +172,8 @@ const orderIdParam = new URLSearchParams(location.search).get("id");
 
 async function loadInvoice(){
   const res = await fetch(API + "/api/orders/" + orderIdParam, {
-    headers: { Authorization: token }
+    headers: { Authorization: `Bearer ${token}` }
+
   });
   const o = await res.json();
 

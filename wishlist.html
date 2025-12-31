@@ -123,7 +123,8 @@
         /* LOAD WISHLIST */
         async function loadWishlist() {
             const res = await fetch(API + "/api/wishlist", {
-                headers: { Authorization: token }
+                headers: { Authorization: `Bearer ${token}` }
+
             });
             const data = await res.json();
 
@@ -178,7 +179,8 @@
         async function removeFromWishlist(productId) {
             await fetch(API + "/api/wishlist/" + productId, {
                 method: "DELETE",
-                headers: { Authorization: token }
+                headers: { Authorization: `Bearer ${token}` }
+
             });
             loadWishlist();
         }

@@ -29,7 +29,8 @@ function show(sectionId) {
 async function loadProfile() {
   try {
     const res = await fetch(API + "/api/auth/me", {
-      headers: { Authorization: token }
+      headers: { Authorization: `Bearer ${token}` }
+
     });
     const user = await res.json();
 
@@ -48,7 +49,8 @@ async function loadProfile() {
 async function loadOrders() {
   try {
     const res = await fetch(API + "/api/orders/my", {
-      headers: { Authorization: token }
+      headers: { Authorization: `Bearer ${token}` }
+
     });
     const orders = await res.json();
 
@@ -83,7 +85,8 @@ function viewOrder(orderId) {
 async function loadAddresses() {
   try {
     const res = await fetch(API + "/api/checkout/address", {
-      headers: { Authorization: token }
+      headers: { Authorization: `Bearer ${token}` }
+
     });
     const addresses = await res.json();
 
@@ -122,7 +125,8 @@ async function deleteAddress(id) {
 
   await fetch(API + "/api/checkout/address/" + id, {
     method: "DELETE",
-    headers: { Authorization: token }
+    headers: { Authorization: `Bearer ${token}` }
+
   });
 
   loadAddresses();
@@ -134,7 +138,8 @@ async function deleteAddress(id) {
 async function loadWallet() {
   try {
     const res = await fetch(API + "/api/wallet", {
-      headers: { Authorization: token }
+      headers: { Authorization: `Bearer ${token}` }
+
     });
     const wallet = await res.json();
 

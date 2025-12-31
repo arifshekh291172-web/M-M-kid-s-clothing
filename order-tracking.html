@@ -99,7 +99,8 @@ const orderId = new URLSearchParams(location.search).get("id");
 
 async function loadTracking(){
   const res = await fetch(API + "/api/orders/" + orderId, {
-    headers: { Authorization: token }
+    headers: { Authorization: `Bearer ${token}` }
+
   });
 
   if (!res.ok) {

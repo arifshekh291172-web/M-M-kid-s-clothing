@@ -144,8 +144,8 @@ router.post("/products", adminAuth, async (req, res) => {
       originalPrice,
       sizes,
       badge,
-      mainImage,     // frontend se aata hai
-      extraImages    // frontend se aata hai
+      image,     // frontend se aata hai
+      images    // frontend se aata hai
     } = req.body;
 
     if (!name || !category || !price) {
@@ -171,8 +171,8 @@ router.post("/products", adminAuth, async (req, res) => {
       originalPrice: Number(originalPrice) || 0,
       sizes: sizes || [],
       badge: badge || "",
-      image: mainImage,           // DB field
-      images: extraImages || [],  // DB field
+      image: image,           // DB field
+      images: images || [],  // DB field
       isActive: true
     });
 

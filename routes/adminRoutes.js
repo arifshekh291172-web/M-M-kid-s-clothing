@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const adminAuth = require("../middleware/adminAuth"); // ⚠️ case sensitive
+const adminAuth = require("../middleware/adminauth"); // ⚠️ case sensitive
 
 const User = require("../models/User");
 const Order = require("../models/Order");

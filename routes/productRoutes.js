@@ -7,7 +7,7 @@ const {
   deleteProduct
 } = require("../controllers/productController");
 
-const adminAuth = require("../middleware/adminAuth");
+const adminAuth = require("../middleware/adminController");
 
 /* ======================================================
    ADMIN PRODUCT ROUTES

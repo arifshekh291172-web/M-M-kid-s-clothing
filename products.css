@@ -1,0 +1,257 @@
+/* ===============================
+   GLOBAL
+================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+body {
+  background: #f1f3f6;
+  color: #212121;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 15px;
+}
+
+/* ===============================
+   PRODUCT WRAPPER
+================================ */
+.product-wrapper {
+  display: flex;
+  gap: 40px;
+  background: #fff;
+  padding: 30px;
+  border-radius: 6px;
+}
+
+/* ===============================
+   IMAGE
+================================ */
+.product-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-image img {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+}
+
+/* ===============================
+   DETAILS
+================================ */
+.product-details {
+  flex: 1.2;
+}
+
+.product-details h1 {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.brand {
+  color: #878787;
+  margin-bottom: 12px;
+}
+
+/* ===============================
+   PRICE
+================================ */
+.price-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 600;
+  color: #212121;
+}
+
+.original {
+  text-decoration: line-through;
+  color: #878787;
+}
+
+.discount {
+  color: #388e3c;
+  font-weight: 500;
+}
+
+/* ===============================
+   DESCRIPTION
+================================ */
+.desc {
+  margin: 18px 0;
+  color: #424242;
+  line-height: 1.6;
+}
+
+/* ===============================
+   SIZE SELECTOR
+================================ */
+.sizes h4 {
+  margin-bottom: 10px;
+}
+
+.size-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.size-btn {
+  padding: 8px 14px;
+  border: 1px solid #d7d7d7;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.size-btn:hover {
+  border-color: #2874f0;
+  color: #2874f0;
+}
+
+.size-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   STOCK INFO
+================================ */
+#stockInfo {
+  margin-top: 10px;
+  color: #388e3c;
+  font-weight: 500;
+}
+
+/* ===============================
+   ACTION BUTTONS (FLIPKART STYLE)
+================================ */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+/* ADD TO CART */
+.cart-btn {
+  flex: 1;
+  padding: 14px;
+  background: #ff9f00;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cart-btn:hover {
+  background: #fb8c00;
+}
+
+/* BUY NOW */
+.buy-btn {
+  flex: 1;
+  padding: 14px;
+  background: #fb641b;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.buy-btn:hover {
+  background: #f4511e;
+}
+
+/* ===============================
+   REVIEWS
+================================ */
+.section-title {
+  margin: 40px 0 15px;
+  font-size: 22px;
+}
+
+.review {
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.review strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.review span {
+  color: #ff9800;
+  font-size: 14px;
+}
+
+/* ===============================
+   SUGGESTED PRODUCTS
+================================ */
+.suggested-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.suggest-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.suggest-card:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.suggest-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+}
+
+.suggest-card h4 {
+  margin: 10px 0 5px;
+  font-size: 16px;
+}
+
+.suggest-card p {
+  font-weight: 600;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+  .product-wrapper {
+    flex-direction: column;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+}

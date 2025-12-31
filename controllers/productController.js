@@ -1,29 +1,75 @@
 const Product = require("../models/Product");
 
 /* ======================================================
-   ADD PRODUCT (ADMIN)
+   ADD PRODUCT (ADMIN) – BASE64 IMAGE
 ====================================================== */
 exports.addProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    console.log("BODY:", req.body);
+    console.log("IMAGE LENGTH:", req.body.image?.length);
 
-    res.json({
+    const {
+      name,
+      brand,
+      category,
+      description,
+      price,
+      originalPrice,
+      badge,
+      sizes,
+      image,
+      images
+    } = req.body;
+
+    /* ===== BASIC VALIDATION ===== */
+    if (
+      !name ||
+      !brand ||
+      !category ||
+      !price ||
+      !originalPrice ||
+      !image ||
+      !sizes ||
+      !sizes.length
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields"
+      });
+    }
+
+    const product = await Product.create({
+      name,
+      brand,
+      category,
+      description,
+      price,
+      originalPrice,
+      badge,
+      sizes,          // [{ label, stock }]
+      image,          // BASE64 main image
+      images: images || [],
+      isActive: true
+    });
+
+    res.status(201).json({
       success: true,
       message: "Product added successfully",
       product
     });
+
   } catch (err) {
-    console.error("Add Product Error:", err);
-    res.json({
+    console.error("Add Product Error:", err.message);
+
+    res.status(500).json({
       success: false,
-      message: "Failed to add product"
+      message: err.message || "Failed to add product"
     });
   }
 };
 
 /* ======================================================
    GET ALL PRODUCTS (INDEX PAGE)
-   Supports: category, search
 ====================================================== */
 exports.getProducts = async (req, res) => {
   try {
@@ -36,7 +82,10 @@ exports.getProducts = async (req, res) => {
     }
 
     if (search) {
-      filter.$text = { $search: search };
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } }
+      ];
     }
 
     const products = await Product.find(filter).sort({ createdAt: -1 });
@@ -47,7 +96,7 @@ exports.getProducts = async (req, res) => {
     });
   } catch (err) {
     console.error("Get Products Error:", err);
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to fetch products"
     });
@@ -55,14 +104,14 @@ exports.getProducts = async (req, res) => {
 };
 
 /* ======================================================
-   GET SINGLE PRODUCT (PRODUCT DETAIL PAGE)
+   GET SINGLE PRODUCT
 ====================================================== */
 exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
     if (!product || !product.isActive) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "Product not found"
       });
@@ -74,7 +123,7 @@ exports.getProductById = async (req, res) => {
     });
   } catch (err) {
     console.error("Get Product By ID Error:", err);
-    res.json({
+    res.status(400).json({
       success: false,
       message: "Invalid product ID"
     });
@@ -89,11 +138,11 @@ exports.updateProduct = async (req, res) => {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!product) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "Product not found"
       });
@@ -106,7 +155,7 @@ exports.updateProduct = async (req, res) => {
     });
   } catch (err) {
     console.error("Update Product Error:", err);
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to update product"
     });
@@ -114,7 +163,7 @@ exports.updateProduct = async (req, res) => {
 };
 
 /* ======================================================
-   DELETE / DEACTIVATE PRODUCT (ADMIN)
+   DELETE / DEACTIVATE PRODUCT
 ====================================================== */
 exports.deleteProduct = async (req, res) => {
   try {
@@ -125,7 +174,7 @@ exports.deleteProduct = async (req, res) => {
     );
 
     if (!product) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "Product not found"
       });
@@ -137,57 +186,9 @@ exports.deleteProduct = async (req, res) => {
     });
   } catch (err) {
     console.error("Delete Product Error:", err);
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to delete product"
-    });
-  }
-};
-
-/* ======================================================
-   REDUCE STOCK AFTER ORDER (CHECKOUT)
-====================================================== */
-exports.reduceStock = async (req, res) => {
-  try {
-    const { cart } = req.body;
-
-    if (!cart || !cart.length) {
-      return res.json({
-        success: false,
-        message: "Cart is empty"
-      });
-    }
-
-    for (const item of cart) {
-      const product = await Product.findById(item._id);
-
-      if (!product) {
-        return res.json({
-          success: false,
-          message: "Product not found"
-        });
-      }
-
-      if (product.stock < item.quantity) {
-        return res.json({
-          success: false,
-          message: `Insufficient stock for ${product.name}`
-        });
-      }
-
-      product.stock -= item.quantity;
-      await product.save();
-    }
-
-    res.json({
-      success: true,
-      message: "Stock updated successfully"
-    });
-  } catch (err) {
-    console.error("Reduce Stock Error:", err);
-    res.json({
-      success: false,
-      message: "Stock update failed"
     });
   }
 };

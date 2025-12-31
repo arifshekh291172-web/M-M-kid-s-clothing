@@ -88,7 +88,7 @@ router.delete("/address/:id", auth, async (req, res) => {
 });
 
 /* ======================================================
-   PLACE ORDER (ATOMIC TRANSACTION)
+   PLACE ORDER (ONLINE PAYMENT ONLY)
 ====================================================== */
 
 router.post("/place-order", auth, async (req, res) => {
@@ -96,7 +96,7 @@ router.post("/place-order", auth, async (req, res) => {
   session.startTransaction();
 
   try {
-    const { addressId, paymentMethod = "COD", useWallet = false } = req.body;
+    const { addressId, useWallet = false } = req.body;
 
     /* USER */
     const user = await User.findById(req.user.id).session(session);
@@ -141,7 +141,7 @@ router.post("/place-order", auth, async (req, res) => {
     const shippingCharge = subtotal >= 999 ? 0 : 49;
     let totalAmount = subtotal + shippingCharge;
 
-    /* WALLET */
+    /* WALLET (OPTIONAL) */
     let walletUsed = 0;
     let wallet = null;
 
@@ -153,7 +153,7 @@ router.post("/place-order", auth, async (req, res) => {
       }
     }
 
-    /* CREATE ORDER */
+    /* CREATE ORDER (PAYMENT PENDING) */
     const [order] = await Order.create(
       [{
         userId: user._id,
@@ -161,8 +161,8 @@ router.post("/place-order", auth, async (req, res) => {
         subtotal,
         shippingCharge,
         totalAmount,
-        paymentMethod,
-        paymentStatus: paymentMethod === "COD" ? "Pending" : "Paid",
+        paymentMethod: "ONLINE",
+        paymentStatus: "Pending",
         shippingAddress: address,
         statusHistory: [{ status: "Pending" }]
       }],
@@ -194,17 +194,18 @@ router.post("/place-order", auth, async (req, res) => {
     cart.items = [];
     await cart.save({ session });
 
-    /* COMMIT */
+    /* COMMIT TRANSACTION */
     await session.commitTransaction();
     session.endSession();
 
-    /* EMAIL */
+    /* EMAIL (AFTER COMMIT) */
     sendOrderConfirmation(user.email, order._id, order.totalAmount);
 
     res.json({
       success: true,
-      message: "Order placed successfully",
-      orderId: order._id
+      message: "Order created. Proceed to payment.",
+      orderId: order._id,
+      amount: order.totalAmount
     });
 
   } catch (err) {

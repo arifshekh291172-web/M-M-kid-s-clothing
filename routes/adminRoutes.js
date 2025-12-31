@@ -1,9 +1,15 @@
 const express = require("express");
 const adminAuth = require("../middleware/adminauth");
 
-/* 🔥 ADD THIS (ONLY NEW PART) */
+/* ===============================
+   IMAGE UPLOAD (MEMORY ONLY)
+   ❌ NO uploads folder
+================================ */
 const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
 
 const User = require("../models/User");
 const Order = require("../models/Order");
@@ -19,7 +25,6 @@ const router = express.Router();
 /* ======================================================
    USERS
 ====================================================== */
-
 router.get("/users", adminAuth, async (req, res) => {
   try {
     const users = await User.find({ role: "user" }).select("-password");
@@ -38,7 +43,6 @@ router.post("/users/block", adminAuth, async (req, res) => {
 /* ======================================================
    ORDERS
 ====================================================== */
-
 router.get("/orders", adminAuth, async (req, res) => {
   try {
     const orders = await Order.find()
@@ -85,7 +89,6 @@ router.post("/orders/status", adminAuth, async (req, res) => {
 /* ======================================================
    REFUND → WALLET
 ====================================================== */
-
 router.post("/orders/refund", adminAuth, async (req, res) => {
   const { orderId, refundAmount, adminNote } = req.body;
 
@@ -129,9 +132,8 @@ router.post("/orders/refund", adminAuth, async (req, res) => {
 });
 
 /* ======================================================
-   PRODUCTS  🔥 REAL FIX HERE
+   PRODUCTS (BASE64 IMAGE – NO uploads)
 ====================================================== */
-
 router.post(
   "/products",
   adminAuth,
@@ -144,7 +146,7 @@ router.post(
       const {
         name,
         brand,
-        category,
+        category, // boy / girl
         description,
         price,
         originalPrice,
@@ -153,22 +155,33 @@ router.post(
       } = req.body;
 
       const mainImage = req.files?.image?.[0];
-
       if (!mainImage) {
         return res.status(400).json({ message: "Main image required" });
       }
 
+      /* ===== BASE64 MAIN IMAGE ===== */
+      const mainImageBase64 =
+        `data:${mainImage.mimetype};base64,${mainImage.buffer.toString("base64")}`;
+
+      /* ===== BASE64 EXTRA IMAGES ===== */
+      const extraImages =
+        req.files?.images?.map(file =>
+          `data:${file.mimetype};base64,${file.buffer.toString("base64")}`
+        ) || [];
+
       const product = await Product.create({
-        name,
-        brand,
-        category,
-        description,
+        name: name.trim(),
+        brand: brand.trim(),
+        category: category.trim(), // boy / girl
+        description: description || "",
         price: Number(price),
         originalPrice: Number(originalPrice),
         stock: Number(stock || 0),
         badge: badge || "",
-        image: mainImage.originalname, // SAME SCHEMA
-        images: []
+
+        // 🔥 MOST IMPORTANT FIX
+        image: mainImageBase64,
+        images: extraImages
       });
 
       res.json({ success: true, product });
@@ -180,8 +193,12 @@ router.post(
   }
 );
 
+/* ======================================================
+   PRODUCTS CRUD
+====================================================== */
 router.get("/products", adminAuth, async (req, res) => {
-  res.json(await Product.find());
+  const products = await Product.find().sort({ createdAt: -1 });
+  res.json(products);
 });
 
 router.put("/products/:id", adminAuth, async (req, res) => {
@@ -197,24 +214,20 @@ router.delete("/products/:id", adminAuth, async (req, res) => {
 /* ======================================================
    SUPPORT
 ====================================================== */
-
 router.get("/tickets", adminAuth, async (req, res) => {
   const tickets = await Ticket.find().sort({ createdAt: -1 });
   res.json(tickets);
 });
 
 router.get("/tickets/:id/messages", adminAuth, async (req, res) => {
-  const messages = await Message.find({
-    ticket: req.params.id
-  }).sort({ createdAt: 1 });
-
+  const messages = await Message.find({ ticket: req.params.id })
+    .sort({ createdAt: 1 });
   res.json(messages);
 });
 
 /* ======================================================
    ANALYTICS
 ====================================================== */
-
 router.get("/analytics", adminAuth, async (req, res) => {
   const orders = await Order.find({
     paymentStatus: { $ne: "Failed" }

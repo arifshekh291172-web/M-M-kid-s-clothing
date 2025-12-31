@@ -1,80 +1,181 @@
-const API = "https://m-m-kid-s-clothing.onrender.com";
+/* ======================================================
+   CONFIG
+====================================================== */
+// const API = "https://m-m-kid-s-clothing.onrender.com";
 
 const params = new URLSearchParams(window.location.search);
 const productId = params.get("id");
 
-if (!productId) {
-  document.body.innerHTML = "<h2>Product not found</h2>";
-}
+let product = null;
+let selectedSize = null;
 
-/* LOAD PRODUCT */
+/* ======================================================
+   LOAD PRODUCT
+====================================================== */
 async function loadProduct() {
-  const res = await fetch(`${API}/api/products/${productId}`);
-  const data = await res.json();
+  try {
+    if (!productId) {
+      document.getElementById("productContainer").innerHTML =
+        "<p>❌ Product ID missing</p>";
+      return;
+    }
 
-  if (!data.success) {
-    document.body.innerHTML = "<h2>Product not found</h2>";
-    return;
+    const res = await fetch(`${API}/api/products/${productId}`);
+    const data = await res.json();
+
+    // 🔥 backend safe (handles {product} OR direct object)
+    product = data.product || data;
+
+    if (!product || !product._id) {
+      document.getElementById("productContainer").innerHTML =
+        "<p>❌ Product not found</p>";
+      return;
+    }
+
+    renderProduct(product);
+
+  } catch (err) {
+    console.error("PRODUCT LOAD ERROR:", err);
+    document.getElementById("productContainer").innerHTML =
+      "<p>❌ Failed to load product</p>";
   }
-
-  renderProduct(data.product);
 }
 
+/* ======================================================
+   RENDER PRODUCT + SIZE CHART
+====================================================== */
 function renderProduct(p) {
-  document.getElementById("productDetail").innerHTML = `
-    <div class="product-detail-wrapper">
 
-      <div class="product-images">
-        <img src="${p.image}" class="main-image">
+  const sizeButtons = p.sizes && p.sizes.length
+    ? p.sizes.map(s => `
+        <button
+          class="size-btn ${s.stock === 0 ? "disabled" : ""}"
+          ${s.stock === 0 ? "disabled" : ""}
+          onclick="selectSize('${s.label}', ${s.stock})">
+          ${s.label}
+        </button>
+      `).join("")
+    : "<p>No sizes available</p>";
+
+  const sizeChart = p.sizes && p.sizes.length
+    ? p.sizes.map(s => `
+        <tr>
+          <td>${s.label}</td>
+          <td>${s.stock > 0 ? s.stock : "Out of stock"}</td>
+        </tr>
+      `).join("")
+    : `<tr><td colspan="2">No size data</td></tr>`;
+
+  document.getElementById("productContainer").innerHTML = `
+    <div class="product-wrapper">
+
+      <div class="product-image">
+        <img src="${p.image}" alt="${p.name}">
       </div>
 
-      <div class="product-info">
-        <h1>${p.name}</h1>
-        <p class="brand">${p.brand}</p>
+      <div class="product-details">
+        <h1 id="productName">${p.name}</h1>
+        <p id="productBrand">Brand: ${p.brand}</p>
 
-        <div class="rating">
-          ★ ${p.rating} (${p.reviews} reviews)
+        <div class="price-box">
+          <span id="productPrice">₹${p.price}</span>
+          <span id="productOriginal">₹${p.originalPrice}</span>
+          <span class="discount">${p.discount}% OFF</span>
         </div>
 
-        <div class="price">
-          <span class="current">₹${p.price}</span>
-          <span class="original">₹${p.originalPrice}</span>
-          <span class="discount">${p.discount}% off</span>
+        <p id="productDesc">${p.description || ""}</p>
+
+        <!-- SIZE BUTTONS -->
+        <div class="sizes">
+          <h4>Select Size</h4>
+          <div id="sizeContainer">
+            ${sizeButtons}
+          </div>
         </div>
 
-        <p class="description">${p.description || "No description available"}</p>
+        <p id="stockMsg"></p>
 
-        <p class="stock">
-          ${p.stock > 0 ? "In Stock" : "Out of Stock"}
-        </p>
+        <!-- SIZE CHART -->
+        <h4>Size Chart</h4>
+        <table class="size-chart">
+          <thead>
+            <tr>
+              <th>Age Group</th>
+              <th>Available Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sizeChart}
+          </tbody>
+        </table>
 
-        <div class="actions">
-          <button onclick="addToCart('${p._id}')">Add to Cart</button>
-          <button onclick="buyNow('${p._id}')">Buy Now</button>
+        <!-- ACTION BUTTONS -->
+        <div class="action-buttons">
+          <button onclick="addToCart()">ADD TO CART</button>
+          <button onclick="buyNow()">BUY NOW</button>
         </div>
-
       </div>
+
     </div>
   `;
 }
 
-loadProduct();
+/* ======================================================
+   SIZE SELECT
+====================================================== */
+function selectSize(size, stock) {
+  selectedSize = size;
 
-/* CART (SIMPLE) */
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  document.querySelectorAll(".size-btn")
+    .forEach(btn => btn.classList.remove("active"));
 
-function addToCart(id) {
-  const existing = cart.find(i => i._id === id);
-  if (existing) {
-    existing.quantity++;
-  } else {
-    cart.push({ _id: id, quantity: 1 });
+  event.target.classList.add("active");
+
+  document.getElementById("stockMsg").innerText =
+    `Selected size: ${size} | Stock: ${stock}`;
+}
+
+/* ======================================================
+   ADD TO CART (LOCAL STORAGE)
+====================================================== */
+function addToCart() {
+  if (!selectedSize) {
+    alert("Please select a size");
+    return;
   }
+
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  const existing = cart.find(
+    item => item._id === product._id && item.size === selectedSize
+  );
+
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      size: selectedSize,
+      qty: 1
+    });
+  }
+
   localStorage.setItem("cart", JSON.stringify(cart));
   alert("Added to cart");
 }
 
-function buyNow(id) {
-  addToCart(id);
-  window.location.href = "checkout.html";
+/* ======================================================
+   BUY NOW
+====================================================== */
+function buyNow() {
+  addToCart();
+  window.location.href = "cart.html";
 }
+
+/* ======================================================
+   INIT
+====================================================== */
+loadProduct();

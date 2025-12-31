@@ -1,62 +1,283 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+  <meta charset="UTF-8" />
   <title>Add Product | Admin</title>
-  <link rel="stylesheet" href="product.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    .preview {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    :root {
+      --primary: #4f46e5;
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 25px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .grid-full {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    /* SIZE SECTION */
+    .sizes {
       margin-top: 10px;
     }
+
+    .size-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .size-row span {
+      width: 80px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .size-row input {
+      width: 120px;
+    }
+
+    /* IMAGE PREVIEW */
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     .preview img {
       width: 90px;
       height: 90px;
       object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #ddd;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    /* BUTTON */
+    .actions {
+      margin-top: 25px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 14px 26px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    #msg {
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-full {
+        grid-column: span 1;
+      }
+
+      .size-row span {
+        width: 65px;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<h2>Add New Product</h2>
+  <div class="container">
+    <h2>➕ Add New Product</h2>
 
-<div class="card">
+    <div class="card">
 
-  <input id="name" placeholder="Product Name">
-  <input id="brand" placeholder="Brand">
-  <input id="category" placeholder="Category (men / women / shoes)">
-  <textarea id="description" placeholder="Description"></textarea>
+      <div class="grid">
+        <div>
+          <label>Product Name</label>
+          <input id="name" placeholder="Enter product name">
+        </div>
 
-  <input id="price" type="number" placeholder="Selling Price">
-  <input id="originalPrice" type="number" placeholder="Original Price">
-  <input id="stock" type="number" placeholder="Stock">
+        <div>
+          <label>Brand</label>
+          <input id="brand" placeholder="Brand name">
+        </div>
 
-  <!-- FILE UPLOAD -->
-  <label>Main Image</label>
-  <input id="mainImage" type="file" accept="image/*">
+        <div>
+          <label>Category</label>
+          <input id="category" placeholder="kids / boys / girls">
+        </div>
 
-  <label>Extra Images</label>
-  <input id="extraImages" type="file" multiple accept="image/*">
+        <div>
+          <label>Badge</label>
+          <select id="badge">
+            <option value="">No Badge</option>
+            <option>New</option>
+            <option>Bestseller</option>
+            <option>Popular</option>
+            <option>Trending</option>
+            <option>Hot Deal</option>
+          </select>
+        </div>
 
-  <div class="preview" id="preview"></div>
+        <div class="grid-full">
+          <label>Description</label>
+          <textarea id="description" placeholder="Product description"></textarea>
+        </div>
 
-  <select id="badge">
-    <option value="">No Badge</option>
-    <option>New</option>
-    <option>Bestseller</option>
-    <option>Popular</option>
-    <option>Trending</option>
-    <option>Hot Deal</option>
-  </select>
+        <div>
+          <label>Selling Price</label>
+          <input id="price" type="number" placeholder="₹">
+        </div>
 
-  <button onclick="addProduct()">Add Product</button>
+        <div>
+          <label>Original Price</label>
+          <input id="originalPrice" type="number" placeholder="₹">
+        </div>
 
-  <p id="msg"></p>
-</div>
+        <!-- SIZE WISE STOCK -->
+        <div class="grid-full sizes">
+          <label>Size-wise Stock</label>
 
-<script src="admin-add-product.js"></script>
+          <div class="size-row">
+            <span>1Y-2Y</span>
+            <input type="number" id="size-1" placeholder="Stock">
+          </div>
+
+          <div class="size-row">
+            <span>2Y-3Y</span>
+            <input type="number" id="size-2" placeholder="Stock">
+          </div>
+
+          <div class="size-row">
+            <span>3Y-4Y</span>
+            <input type="number" id="size-3" placeholder="Stock">
+          </div>
+
+          <div class="size-row">
+            <span>4Y-5Y</span>
+            <input type="number" id="size-4" placeholder="Stock">
+          </div>
+
+          <div class="size-row">
+            <span>5Y-6Y</span>
+            <input type="number" id="size-5" placeholder="Stock">
+          </div>
+        </div>
+
+        <!-- IMAGES -->
+        <div>
+          <label>Main Image</label>
+          <input id="mainImage" type="file" accept="image/*">
+        </div>
+
+        <div>
+          <label>Extra Images</label>
+          <input id="extraImages" type="file" multiple accept="image/*">
+        </div>
+
+        <div class="grid-full">
+          <div class="preview" id="preview"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button onclick="addProduct()">Add Product</button>
+      </div>
+
+      <p id="msg"></p>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="admin-add-product.js"></script>
 </body>
+
 </html>

@@ -1,250 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>My Cart | M&M Kid's Wear</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>My Cart | M&M Kid's Wear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Inter;
-            background: #f5f7fb;
-            color: #0f172a;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, sans-serif;
+      background: #f5f7fb;
+      color: #0f172a;
+    }
 
-        header {
-            background: #0f172a;
-            color: #fff;
-            padding: 16px 24px;
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .cart-badge {
-            background: #ef4444;
-            color: #fff;
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 999px;
-            margin-left: 6px;
-        }
+    .cart-badge {
+      background: #ef4444;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-left: 6px;
+    }
 
-        .container {
-            max-width: 1000px;
-            margin: 30px auto;
-        }
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
 
-        .card {
-            background: #fff;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
-            margin-bottom: 20px;
-        }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+      margin-bottom: 20px;
+    }
 
-        .cart-item {
-            display: flex;
-            gap: 16px;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 16px 0;
-        }
+    .cart-item {
+      display: flex;
+      gap: 16px;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 0;
+    }
 
-        .cart-item img {
-            width: 90px;
-            height: 90px;
-            border-radius: 10px;
-            object-fit: cover;
-        }
+    .cart-item img {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
 
-        .cart-item h4 {
-            margin: 0 0 6px;
-        }
+    .cart-item h4 {
+      margin: 0 0 6px;
+    }
 
-        .actions {
-            margin-top: 8px;
-            display: flex;
-            gap: 14px;
-        }
+    .actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 14px;
+    }
 
-        .actions span {
-            color: #2563eb;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-        }
+    .actions span {
+      color: #2563eb;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
 
-        .actions span.remove {
-            color: #ef4444;
-        }
+    .actions span.remove {
+      color: #ef4444;
+    }
 
-        .total {
-            font-size: 20px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-        }
+    .total {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+    }
 
-        button {
-            border: none;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+    button {
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 16px;
+    }
 
-        .primary {
-            background: #2563eb;
-            color: #fff;
-            width: 100%;
-            font-size: 16px;
-        }
+    .primary {
+      background: #fb641b;
+      color: #fff;
+      width: 100%;
+    }
 
-        .empty {
-            text-align: center;
-            color: #64748b;
-            padding: 40px 0;
-        }
-    </style>
+    .empty {
+      text-align: center;
+      color: #64748b;
+      padding: 40px 0;
+    }
+  </style>
 </head>
 
 <body>
 
-    <header>
-        🛒 My Cart
-        <div>
-            Cart
-            <span class="cart-badge" id="cartCount">0</span>
-        </div>
-    </header>
+<header>
+  🛒 My Cart
+  <div>
+    Cart <span class="cart-badge" id="cartCount">0</span>
+  </div>
+</header>
 
-    <div class="container">
+<div class="container">
 
-        <div class="card" id="cartContainer">
-            <!-- Cart items load here -->
-        </div>
+  <div class="card" id="cartContainer"></div>
 
-        <div class="card">
-            <div class="total">
-                <span>Total</span>
-                <span id="totalAmount">₹0</span>
-            </div>
-            <br>
-            <button class="primary" onclick="goCheckout()">Proceed to Checkout</button>
-        </div>
-
+  <div class="card">
+    <div class="total">
+      <span>Total</span>
+      <span id="totalAmount">₹0</span>
     </div>
+    <br>
+    <button class="primary" onclick="goCheckout()">Proceed to Checkout</button>
+  </div>
 
-    <script>
-        /* ================= CONFIG ================= */
-        const API = "https://m-m-kid-s-clothing.onrender.com";
-        const token = localStorage.getItem("token");
+</div>
 
-        if (!token) location.href = "login.html";
+<script>
+/* ================= LOAD CART ================= */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-        /* ================= LOAD CART ================= */
-        async function loadCart() {
-            const res = await fetch(API + "/api/cart", {
-                headers: { Authorization: token }
-            });
-            const cart = await res.json();
+function loadCart() {
+  const box = document.getElementById("cartContainer");
+  box.innerHTML = "";
+  let total = 0;
 
-            const box = document.getElementById("cartContainer");
-            box.innerHTML = "";
-            let total = 0;
+  if (!cart.length) {
+    box.innerHTML = `<div class="empty">Your cart is empty</div>`;
+    document.getElementById("totalAmount").innerText = "₹0";
+    updateBadge();
+    return;
+  }
 
-            if (!cart.items || cart.items.length === 0) {
-                box.innerHTML = `<div class="empty">Your cart is empty</div>`;
-                totalAmount.innerText = "₹0";
-                updateCartBadge();
-                return;
-            }
+  cart.forEach((i, index) => {
+    total += i.price * i.qty;
 
-            cart.items.forEach(i => {
-                const p = i.product;
-                total += p.price * i.quantity;
-
-                box.innerHTML += `
+    box.innerHTML += `
       <div class="cart-item">
-        <img src="${p.image || 'https://via.placeholder.com/100'}">
+        <img src="${i.image}">
         <div>
-          <h4>${p.name}</h4>
-          <p>₹${p.price} × ${i.quantity}</p>
+          <h4>${i.name}</h4>
+          <p>Size: ${i.size}</p>
+          <p>₹${i.price} × ${i.qty}</p>
 
           <div class="actions">
-            <span onclick="saveForLater('${p._id}')">Save for later</span>
-            <span class="remove" onclick="removeFromCart('${p._id}')">Remove</span>
+            <span onclick="changeQty(${index}, -1)">-</span>
+            <span>${i.qty}</span>
+            <span onclick="changeQty(${index}, 1)">+</span>
+            <span class="remove" onclick="removeItem(${index})">Remove</span>
           </div>
         </div>
       </div>
     `;
-            });
+  });
 
-            totalAmount.innerText = "₹" + total;
-            updateCartBadge();
-        }
+  document.getElementById("totalAmount").innerText = "₹" + total;
+  updateBadge();
+}
 
-        /* ================= SAVE FOR LATER ================= */
-        async function saveForLater(productId) {
-            // add to wishlist
-            await fetch(API + "/api/wishlist/toggle", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: token
-                },
-                body: JSON.stringify({ productId })
-            });
+function changeQty(index, delta) {
+  cart[index].qty += delta;
+  if (cart[index].qty <= 0) cart.splice(index, 1);
+  saveCart();
+}
 
-            // remove from cart
-            await fetch(API + "/api/cart/remove/" + productId, {
-                method: "DELETE",
-                headers: { Authorization: token }
-            });
+function removeItem(index) {
+  cart.splice(index, 1);
+  saveCart();
+}
 
-            loadCart();
-            alert("Saved for later ❤️");
-        }
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+  loadCart();
+}
 
-        /* ================= REMOVE FROM CART ================= */
-        async function removeFromCart(productId) {
-            await fetch(API + "/api/cart/remove/" + productId, {
-                method: "DELETE",
-                headers: { Authorization: token }
-            });
+function updateBadge() {
+  let count = 0;
+  cart.forEach(i => count += i.qty);
+  document.getElementById("cartCount").innerText = count;
+}
 
-            loadCart();
-        }
+function goCheckout() {
+  alert("Next step: checkout + order API");
+}
 
-        /* ================= CART BADGE ================= */
-        async function updateCartBadge() {
-            const res = await fetch(API + "/api/cart", {
-                headers: { Authorization: token }
-            });
-            const cart = await res.json();
-
-            let count = 0;
-            if (cart.items) {
-                cart.items.forEach(i => count += i.quantity);
-            }
-            document.getElementById("cartCount").innerText = count;
-        }
-
-        /* ================= CHECKOUT ================= */
-        function goCheckout() {
-            location.href = "checkout.html";
-        }
-
-        /* ================= INIT ================= */
-        loadCart();
-    </script>
+loadCart();
+</script>
 
 </body>
-
 </html>

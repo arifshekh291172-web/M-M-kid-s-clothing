@@ -276,13 +276,30 @@
             </section>
 
             <!-- USERS -->
-            <section id="users" class="hidden">
-                <div class="row">
-                    <h2>Users</h2>
-                    <input class="right" placeholder="Search user..." onkeyup="filterTable(this,'usersTable')">
-                </div>
-                <table id="usersTable"></table>
-            </section>
+          <section id="users" class="hidden">
+  <div class="row">
+    <h2>Users</h2>
+    <input 
+      class="right" 
+      placeholder="Search user..." 
+      onkeyup="filterTable(this,'usersTable')"
+    >
+  </div>
+
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- users load here -->
+    </tbody>
+  </table>
+</section>
 
             <!-- ORDERS -->
             <section id="orders" class="hidden">
@@ -373,68 +390,163 @@
 
         /* USERS / ORDERS CODE — SAME AS BEFORE */
 
-        async function loadUsers() {
-            const r = await fetch(API + "/api/admin/users", { headers: { Authorization: token } });
-            const users = await r.json();
+      async function loadUsers() {
+  const r = await fetch(API + "/api/admin/users", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
 
-            const tbody = document.querySelector("#usersTable tbody");
-            tbody.innerHTML = users.map(u => `
-        <tr class="user-row">
-            <td>${u.name}</td>
-            <td>${u.email}</td>
-            <td>${u.phone || '—'}</td>
-            <td>${new Date(u.createdAt).toLocaleDateString()}</td>
-        </tr>
-    `).join("");
-        }
+  const users = await r.json();
+
+  const table = document.getElementById("usersTable");
+
+  // 🔥 ensure tbody exists
+  let tbody = table.querySelector("tbody");
+  if (!tbody) {
+    table.innerHTML += "<tbody></tbody>";
+    tbody = table.querySelector("tbody");
+  }
+
+  if (!users.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4">No users found</td>
+      </tr>`;
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>${u.name}</td>
+      <td>${u.email}</td>
+      <td>${u.phone || "—"}</td>
+      <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+    </tr>
+  `).join("");
+}
+
         /* ===============================
            PRODUCTS
         ================================ */
         async function loadProducts() {
             const r = await fetch(API + "/api/admin/products", {
-                headers: { Authorization: token }
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
+
             const products = await r.json();
+            console.log("ADMIN PRODUCTS:", products); // 👈 debug
 
             const tbody = document.querySelector("#productsTable tbody");
 
+            if (!products.length) {
+                tbody.innerHTML = `<tr><td colspan="6">No products found</td></tr>`;
+                return;
+            }
+
             tbody.innerHTML = products.map(p => `
-        <tr>
-            <td>
-                <img 
-                    src="${p.image || 'https://via.placeholder.com/60'}"
-                    style="
-                        width:60px;
-                        height:60px;
-                        object-fit:cover;
-                        border-radius:10px;
-                        border:1px solid #e5e7eb;
-                    "
-                />
-            </td>
-            <td>
-                <strong>${p.name}</strong>
-                <div style="font-size:12px;color:#64748b">
-                    ${p.category || "—"}
-                </div>
-            </td>
-            <td>₹${p.price}</td>
-            <td>${p.stock}</td>
-            <td>
-                <span class="badge ${p.stock > 0 ? 'green' : 'red'}">
-                    ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                </span>
-            </td>
-            <td>
-                <div class="actions">
-                    <button class="primary" onclick="editProduct('${p._id}')">Edit</button>
-                    <button class="warn" onclick="viewProduct('${p._id}')">View</button>
-                    <button class="danger" onclick="deleteProduct('${p._id}')">Delete</button>
-                </div>
-            </td>
-        </tr>
-    `).join("");
+    <tr>
+      <td>
+        <img 
+          src="${p.image}" 
+          style="
+            width:60px;
+            height:60px;
+            object-fit:cover;
+            border-radius:10px;
+            border:1px solid #e5e7eb;
+          "
+        />
+      </td>
+      <td>
+        <strong>${p.name}</strong>
+        <div style="font-size:12px;color:#64748b">
+          ${p.category}
+        </div>
+      </td>
+      <td>₹${p.price}</td>
+      <td>${p.stock}</td>
+      <td>
+        <span class="badge ${p.stock > 0 ? 'green' : 'red'}">
+          ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
+        </span>
+      </td>
+      <td>
+        <div class="actions">
+          <button class="primary" onclick="editProduct('${p._id}')">Edit</button>
+          <button class="warn" onclick="viewProduct('${p._id}')">View</button>
+          <button class="danger" onclick="deleteProduct('${p._id}')">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
         }
+async function loadOrders() {
+  const r = await fetch(API + "/api/admin/orders", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const orders = await r.json();
+  console.log("ADMIN ORDERS:", orders);
+
+  const table = document.getElementById("ordersTable");
+
+  if (!orders.length) {
+    table.innerHTML = `<tr><td>No orders found</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>User</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${orders.map(o => `
+        <tr>
+          <td>${o._id.slice(-6)}</td>
+          <td>
+            ${o.userId?.name || "User"}<br>
+            <small>${o.userId?.email || ""}</small>
+          </td>
+          <td>₹${o.totalAmount}</td>
+          <td>
+            <span class="badge ${
+              o.status === "Delivered"
+                ? "green"
+                : o.status === "Cancelled"
+                ? "red"
+                : ""
+            }">
+              ${o.status}
+            </span>
+          </td>
+          <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+          <td>
+            <button class="primary" onclick="viewOrder('${o._id}')">
+              View
+            </button>
+          </td>
+        </tr>
+      `).join("")}
+    </tbody>
+  `;
+}
+
+/* OPTIONAL: VIEW ORDER */
+function viewOrder(id) {
+  window.open("order-view.html?id=" + id, "_blank");
+}
 
         /* ===============================
            ACTION HANDLERS

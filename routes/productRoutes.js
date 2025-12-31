@@ -2,42 +2,22 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  addProduct,
   getProducts,
-  getProductById,
-  updateProduct,
-  deleteProduct,
-  reduceStock
+  getProductById
 } = require("../controllers/productController");
 
 /* ======================================================
-   ADMIN ROUTES
+   PUBLIC PRODUCT ROUTES
+   Base path: /api/products
 ====================================================== */
 
-// Add product
-router.post("/add", addProduct);
-
-// Update product
-router.put("/:id", updateProduct);
-
-// Delete / deactivate product
-router.delete("/:id", deleteProduct);
-
-/* ======================================================
-   PUBLIC ROUTES
-====================================================== */
-
-// Get all products (index.html, category, search)
+// 🔹 GET ALL PRODUCTS
+// Example: GET /api/products
 router.get("/", getProducts);
 
-// Get single product (product detail page)
+// 🔹 GET SINGLE PRODUCT BY ID
+// Example: GET /api/products/:id
+// ⚠️ Always LAST (dynamic route)
 router.get("/:id", getProductById);
-
-/* ======================================================
-   ORDER / STOCK
-====================================================== */
-
-// Reduce stock after checkout
-router.put("/reduce-stock", reduceStock);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
@@ -22,18 +23,29 @@ const server = http.createServer(app);
 connectDB();
 
 /* ======================================================
-   GLOBAL MIDDLEWARES  🔥 MOST IMPORTANT
+   GLOBAL MIDDLEWARES  🔥 VERY IMPORTANT
 ====================================================== */
 app.use(cors({ origin: "*" }));
 
-// 🔴 YAHI LINE MISSING / PROBLEM THI
+// 🔥 BASE64 IMAGE SUPPORT (MANDATORY)
 app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 /* ======================================================
    STATIC FILES
 ====================================================== */
 app.use(express.static(path.join(__dirname, "public")));
+
+/* ======================================================
+   ROOT HTML FILES
+====================================================== */
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/products.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "products.html"));
+});
 
 /* ======================================================
    SOCKET.IO SETUP
@@ -43,7 +55,7 @@ const io = new Server(server, {
 });
 
 /* ======================================================
-   API ROUTES (AFTER BODY PARSER)
+   API ROUTES
 ====================================================== */
 
 // USER
@@ -57,13 +69,6 @@ app.use("/api/wallet", require("./routes/walletRoutes"));
 // ADMIN
 app.use("/api/admin/auth", require("./routes/adminAuthRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
-
-/* ======================================================
-   HEALTH CHECK
-====================================================== */
-app.get("/", (req, res) => {
-  res.send("✅ M&M Kid's Wear Backend Running");
-});
 
 /* ======================================================
    SOCKET.IO – LIVE CHAT
@@ -178,7 +183,7 @@ app.post("/api/support/ticket", async (req, res) => {
 });
 
 /* ======================================================
-   404 HANDLER
+   404 HANDLER (ALWAYS LAST)
 ====================================================== */
 app.use((req, res) => {
   res.status(404).json({

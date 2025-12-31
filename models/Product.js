@@ -1,7 +1,26 @@
 const mongoose = require("mongoose");
 
 /* ======================================================
-   PRODUCT SCHEMA (FLIPKART STYLE)
+   SIZE SUB-SCHEMA (AGE / SIZE-WISE STOCK)
+====================================================== */
+const sizeSchema = new mongoose.Schema(
+  {
+    label: {
+      type: String,          // e.g. "1Y-2Y", "2Y-3Y"
+      required: true,
+      trim: true
+    },
+    stock: {
+      type: Number,          // stock for that size
+      required: true,
+      min: 0
+    }
+  },
+  { _id: false }
+);
+
+/* ======================================================
+   PRODUCT SCHEMA (E-COMMERCE READY)
 ====================================================== */
 const productSchema = new mongoose.Schema(
   {
@@ -46,15 +65,20 @@ const productSchema = new mongoose.Schema(
     },
 
     discount: {
-      type: Number,
+      type: Number,          // auto calculated %
       default: 0
     },
 
     /* INVENTORY */
     stock: {
-      type: Number,
+      type: Number,          // total stock (auto from sizes)
       default: 0,
       min: 0
+    },
+
+    sizes: {
+      type: [sizeSchema],    // size-wise stock
+      default: []
     },
 
     isActive: {
@@ -63,7 +87,7 @@ const productSchema = new mongoose.Schema(
       index: true
     },
 
-    /* RATINGS (AGGREGATE) */
+    /* RATINGS */
     rating: {
       type: Number,
       default: 0,
@@ -76,34 +100,31 @@ const productSchema = new mongoose.Schema(
       default: 0
     },
 
-    /* MEDIA */
+    /* MEDIA (BASE64 IMAGES) */
     image: {
-      type: String,
+      type: String,          // main image (BASE64)
       required: true
     },
 
     images: {
-      type: [String],
+      type: [String],        // extra images (BASE64)
       default: []
     },
 
+    /* BADGE */
     badge: {
       type: String,
       enum: ["New", "Bestseller", "Popular", "Trending", "Hot Deal", ""],
       default: ""
     }
   },
-  {
-    timestamps: true
-  }
+  { timestamps: true }
 );
 
 /* ======================================================
    AUTO CALCULATE DISCOUNT %
-   ❌ NO async
-   ❌ NO next()
 ====================================================== */
-productSchema.pre("save", function () {
+productSchema.pre("save", function (next) {
   if (
     this.originalPrice &&
     this.price &&
@@ -115,10 +136,26 @@ productSchema.pre("save", function () {
   } else {
     this.discount = 0;
   }
+  next();
 });
 
 /* ======================================================
-   INDEXES (PERFORMANCE)
+   AUTO CALCULATE TOTAL STOCK FROM SIZES
+====================================================== */
+productSchema.pre("save", function (next) {
+  if (Array.isArray(this.sizes) && this.sizes.length > 0) {
+    this.stock = this.sizes.reduce(
+      (total, s) => total + (Number(s.stock) || 0),
+      0
+    );
+  } else {
+    this.stock = 0;
+  }
+  next();
+});
+
+/* ======================================================
+   TEXT SEARCH INDEX
 ====================================================== */
 productSchema.index({ name: "text", brand: "text" });
 

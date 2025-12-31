@@ -1,14 +1,14 @@
 const Product = require("../models/Product");
 
 /* ======================================================
-   ADD PRODUCT (ADMIN) – BASE64 IMAGE
+   ADD PRODUCT (ADMIN) – BASE64 IMAGE (FINAL)
 ====================================================== */
 exports.addProduct = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
+    console.log("REQ BODY KEYS:", Object.keys(req.body));
     console.log("IMAGE LENGTH:", req.body.image?.length);
 
-    const {
+    let {
       name,
       brand,
       category,
@@ -21,34 +21,56 @@ exports.addProduct = async (req, res) => {
       images
     } = req.body;
 
+    /* ===== FIX 1: sizes STRING aaye to JSON banao ===== */
+    if (typeof sizes === "string") {
+      try {
+        sizes = JSON.parse(sizes);
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid sizes format"
+        });
+      }
+    }
+
     /* ===== BASIC VALIDATION ===== */
-    if (
-      !name ||
-      !brand ||
-      !category ||
-      !price ||
-      !originalPrice ||
-      !image ||
-      !sizes ||
-      !sizes.length
-    ) {
+    if (!name || !brand || !category || !price || !originalPrice) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields"
       });
     }
 
+    if (
+      !image ||
+      typeof image !== "string" ||
+      !image.startsWith("data:image")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Main image required"
+      });
+    }
+
+    if (!Array.isArray(sizes) || sizes.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one size required"
+      });
+    }
+
+    /* ===== CREATE PRODUCT ===== */
     const product = await Product.create({
-      name,
-      brand,
-      category,
-      description,
-      price,
-      originalPrice,
-      badge,
-      sizes,          // [{ label, stock }]
-      image,          // BASE64 main image
-      images: images || [],
+      name: name.trim(),
+      brand: brand.trim(),
+      category: category.trim(),
+      description: description?.trim() || "",
+      price: Number(price),
+      originalPrice: Number(originalPrice),
+      badge: badge || "",
+      sizes,
+      image,                 // ✅ BASE64
+      images: images || [],  // ✅ BASE64 ARRAY
       isActive: true
     });
 
@@ -59,17 +81,17 @@ exports.addProduct = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Add Product Error:", err.message);
+    console.error("Add Product Error:", err);
 
     res.status(500).json({
       success: false,
-      message: err.message || "Failed to add product"
+      message: "Failed to add product"
     });
   }
 };
 
 /* ======================================================
-   GET ALL PRODUCTS (INDEX PAGE)
+   GET ALL PRODUCTS
 ====================================================== */
 exports.getProducts = async (req, res) => {
   try {
@@ -131,7 +153,7 @@ exports.getProductById = async (req, res) => {
 };
 
 /* ======================================================
-   UPDATE PRODUCT (ADMIN)
+   UPDATE PRODUCT
 ====================================================== */
 exports.updateProduct = async (req, res) => {
   try {

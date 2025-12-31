@@ -1,21 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Product Details | M&M Kid's Wear</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="product.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GOOGLE FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      background: #f1f3f6;
+      color: #212121;
+    }
+
+    /* ===============================
+       CONTAINER
+    ================================ */
+    .page {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 15px;
+      background: #fff;
+    }
+
+    /* ===============================
+       PRODUCT LAYOUT
+    ================================ */
+    .product-wrapper {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    /* LEFT IMAGE */
+    .product-image {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #e0e0e0;
+      padding: 20px;
+    }
+
+    .product-image img {
+      max-width: 100%;
+      max-height: 450px;
+      object-fit: contain;
+    }
+
+    /* RIGHT DETAILS */
+    .product-details {
+      flex: 1.2;
+      min-width: 300px;
+    }
+
+    .product-details h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .brand {
+      color: #878787;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    /* RATING */
+    .rating-box {
+      display: inline-flex;
+      align-items: center;
+      background: #388e3c;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    /* PRICE */
+    .price-box {
+      margin: 15px 0;
+    }
+
+    .price {
+      font-size: 28px;
+      font-weight: 700;
+      margin-right: 10px;
+    }
+
+    .original {
+      text-decoration: line-through;
+      color: #878787;
+      margin-right: 10px;
+    }
+
+    .discount {
+      color: #388e3c;
+      font-weight: 600;
+    }
+
+    .desc {
+      margin: 15px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ===============================
+       SIZE
+    ================================ */
+    .sizes h4 {
+      margin-bottom: 8px;
+    }
+
+    .size-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .size-btn {
+      border: 1px solid #c2c2c2;
+      background: #fff;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .size-btn:hover {
+      border-color: #2874f0;
+      color: #2874f0;
+    }
+
+    .size-btn.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #stockInfo {
+      font-size: 13px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    /* ===============================
+       ACTION BUTTONS
+    ================================ */
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .action-buttons button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .add-cart {
+      background: #ff9f00;
+      color: #fff;
+    }
+
+    .buy-now {
+      background: #fb641b;
+      color: #fff;
+    }
+
+    /* ===============================
+       SIZE CHART
+    ================================ */
+    .size-chart {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .size-chart th,
+    .size-chart td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .size-chart th {
+      background: #f5f5f5;
+    }
+
+    /* ===============================
+       SUGGESTED
+    ================================ */
+    .section-title {
+      margin: 30px 0 15px;
+      font-size: 18px;
+    }
+
+    .suggested-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+    }
+
+    .suggest-card {
+      border: 1px solid #e0e0e0;
+      padding: 10px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .suggest-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+    }
+
+    .suggest-card h4 {
+      font-size: 14px;
+      margin: 8px 0;
+    }
+
+    .suggest-card p {
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .product-wrapper {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <a href="index.html">← Back to Home</a>
-</header>
+  <!-- PRODUCT -->
+  <div class="page">
+    <div id="productContainer"></div>
+  </div>
 
-<div class="container product-detail" id="productDetail">
-  <!-- Loaded by JS -->
-</div>
+  <!-- SUGGESTED -->
+  <div class="page">
+    <h2 class="section-title">You may also like</h2>
+    <div class="suggested-grid" id="suggestedProducts"></div>
+  </div>
 
-<script src="product.js"></script>
+  <!-- JS -->
+  <script src="products.js"></script>
 </body>
+
 </html>

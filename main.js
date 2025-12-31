@@ -1,6 +1,7 @@
 /* =========================================
    GLOBAL STATE
 ========================================= */
+
 let products = [];
 let displayedProducts = [];
 let cart = [];
@@ -19,10 +20,10 @@ document.addEventListener("DOMContentLoaded", () => {
 ========================================= */
 async function loadProducts() {
   try {
-    const res = await fetch("https://m-m-kid-s-clothing.onrender.com/api/products");
+    const res = await fetch(API + "/api/products");
     const data = await res.json();
 
-    products = data.products || data;
+    products = data.products || [];
     displayedProducts = [...products];
 
     renderProducts();
@@ -36,63 +37,91 @@ async function loadProducts() {
 ========================================= */
 function renderProducts() {
   const grid = document.getElementById("productsGrid");
+  if (!grid) return;
 
   if (!displayedProducts.length) {
     grid.innerHTML = "<p>No products found</p>";
     return;
   }
 
-  grid.innerHTML = displayedProducts.map(p => `
-    <div class="product-card">
-      <div class="product-image-wrapper">
-        <img src="${p.image}" class="product-image" />
-        ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ""}
-        <button class="wishlist-btn" onclick="toggleWishlist('${p._id}')">♡</button>
-      </div>
+  grid.innerHTML = displayedProducts.map(p => {
 
-      <div class="product-info">
-        <div class="product-brand">${p.brand}</div>
-        <h3 class="product-name">${p.name}</h3>
+    // ✅ BASE64 IMAGE (DIRECT FROM DB)
+    const imageSrc =
+      p.image && p.image.startsWith("data:image")
+        ? p.image
+        : "https://dummyimage.com/300x400/eee/000&text=No+Image";
 
-        <div class="product-rating">
-          <span class="rating-badge">★ ${p.rating || 0}</span>
-          <span class="rating-count">(${p.reviews || 0})</span>
-        </div>
+    return `
+      <div class="product-card" onclick="openProduct('${p._id}')">
 
-        <div class="product-price">
-          <span class="current-price">₹${p.price}</span>
-          <span class="original-price">₹${p.originalPrice}</span>
-          <span class="discount">${p.discount}% off</span>
-        </div>
+        <div class="product-image-wrapper">
+          <img
+            src="${imageSrc}"
+            class="product-image"
+            alt="${p.name}"
+          />
 
-        <div class="product-actions">
-          <button class="add-to-cart-btn" onclick="addToCart('${p._id}')">
-            Add to Cart
-          </button>
-          <button class="buy-now-btn" onclick="buyNow('${p._id}')">
-            Buy Now
+          ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ""}
+
+          <button class="wishlist-btn"
+            onclick="event.stopPropagation(); toggleWishlist('${p._id}')">
+            ♡
           </button>
         </div>
+
+        <div class="product-info">
+          <div class="product-brand">${p.brand}</div>
+          <h3 class="product-name">${p.name}</h3>
+
+          <div class="product-rating">
+            <span class="rating-badge">★ ${p.rating || 0}</span>
+            <span class="rating-count">(${p.reviews || 0})</span>
+          </div>
+
+          <div class="product-price">
+            <span class="current-price">₹${p.price}</span>
+            <span class="original-price">₹${p.originalPrice}</span>
+            <span class="discount">${p.discount || 0}% off</span>
+          </div>
+
+          <div class="product-actions">
+            <button class="add-to-cart-btn"
+              onclick="event.stopPropagation(); addToCart('${p._id}')">
+              Add to Cart
+            </button>
+            <button class="buy-now-btn"
+              onclick="event.stopPropagation(); buyNow('${p._id}')">
+              Buy Now
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 /* =========================================
-   CATEGORY FILTER (FIXED ACTIVE)
+   OPEN PRODUCT DETAIL
+========================================= */
+function openProduct(id) {
+  window.location.href = `products.html?id=${id}`;
+}
+
+/* =========================================
+   CATEGORY FILTER
 ========================================= */
 function filterByCategory(category, btn) {
   currentCategory = category;
 
   document.querySelectorAll(".category-btn")
     .forEach(b => b.classList.remove("active"));
-
-  btn.classList.add("active");
+  if (btn) btn.classList.add("active");
 
   displayedProducts =
     category === "all"
       ? [...products]
-      : products.filter(p => p.category === category);
+      : products.filter(p => p.category.toLowerCase() === category);
 
   renderProducts();
   scrollToProducts();
@@ -108,19 +137,15 @@ function sortProducts() {
     case "price-low":
       displayedProducts.sort((a, b) => a.price - b.price);
       break;
-
     case "price-high":
       displayedProducts.sort((a, b) => b.price - a.price);
       break;
-
     case "rating":
       displayedProducts.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       break;
-
     case "discount":
-      displayedProducts.sort((a, b) => b.discount - a.discount);
+      displayedProducts.sort((a, b) => (b.discount || 0) - (a.discount || 0));
       break;
-
     default:
       displayedProducts =
         currentCategory === "all"
@@ -135,7 +160,7 @@ function sortProducts() {
    SEARCH
 ========================================= */
 function searchProducts() {
-  const term = document.getElementById("searchInput").value.toLowerCase();
+  const term = document.getElementById("searchInput").value.toLowerCase().trim();
 
   displayedProducts = products.filter(p =>
     p.name.toLowerCase().includes(term) ||
@@ -176,84 +201,42 @@ function updateCart() {
   cartCount.innerText = cart.reduce((s, i) => s + i.qty, 0);
 
   if (!cart.length) {
-    cartItems.innerHTML = `<div class="empty-cart">
-      <div class="empty-cart-icon">🛒</div>
-      <p>Your cart is empty</p>
-    </div>`;
+    cartItems.innerHTML = `<p>Your cart is empty</p>`;
     cartFooter.style.display = "none";
     return;
   }
 
   cartItems.innerHTML = cart.map(i => `
     <div class="cart-item">
-      <img src="${i.image}" class="cart-item-image">
-      <div class="cart-item-info">
-        <div class="cart-item-name">${i.name}</div>
-        <div class="cart-item-price">₹${i.price}</div>
-        <div class="quantity-controls">
-          <button onclick="changeQty('${i._id}', -1)">-</button>
-          <span>${i.qty}</span>
-          <button onclick="changeQty('${i._id}', 1)">+</button>
-        </div>
+      <img src="${i.image}">
+      <div>
+        <p>${i.name}</p>
+        <p>₹${i.price}</p>
       </div>
-      <button class="remove-item" onclick="removeItem('${i._id}')">×</button>
     </div>
   `).join("");
 
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  cartTotal.innerText = `₹${total}`;
+  cartTotal.innerText = "₹" + cart.reduce((s, i) => s + i.price * i.qty, 0);
   cartFooter.style.display = "block";
 }
 
-function changeQty(id, delta) {
-  const item = cart.find(i => i._id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) cart = cart.filter(i => i._id !== id);
-  updateCart();
-}
-
-function removeItem(id) {
-  cart = cart.filter(i => i._id !== id);
-  updateCart();
-}
-
+/* =========================================
+   CART TOGGLE
+========================================= */
 function toggleCart() {
   document.getElementById("cartSidebar").classList.toggle("open");
   document.getElementById("cartOverlay").classList.toggle("active");
 }
 
 /* =========================================
-   WISHLIST (BACKEND READY)
-========================================= */
-async function toggleWishlist(productId) {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Login required");
-    return;
-  }
-
-  await fetch("https://m-m-kid-s-clothing.onrender.com/api/wishlist/toggle", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token
-    },
-    body: JSON.stringify({ productId })
-  });
-
-  showToast("Wishlist updated");
-}
-
-/* =========================================
-   BANNER
+   BANNER SLIDER
 ========================================= */
 let slide = 0;
 function startBannerSlider() {
   setInterval(() => {
     slide = (slide + 1) % 3;
-    document.getElementById("bannerSlider")
-      .style.transform = `translateX(-${slide * 100}%)`;
+    document.getElementById("bannerSlider").style.transform =
+      `translateX(-${slide * 100}%)`;
   }, 5000);
 }
 

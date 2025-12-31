@@ -1,76 +1,108 @@
-/* ======================================================
-   ACCOUNT DROPDOWN
-====================================================== */
-function toggleAccount() {
-  const dropdown = document.getElementById("accountDropdown");
-  if (!dropdown) return;
-  dropdown.classList.toggle("show");
-}
+// // ❌ YAHAN API DECLARE MAT KARO
+// // API should come from config.js
 
-// Close dropdown on outside click
-document.addEventListener("click", (e) => {
-  const wrapper = document.getElementById("accountWrapper");
-  const dropdown = document.getElementById("accountDropdown");
+// const IMAGE_BASE = API; // backend base url
+// let allProducts = [];
 
-  if (!wrapper || !dropdown) return;
+// /* ======================================================
+//    LOAD PRODUCTS
+// ====================================================== */
+// fetch(API + "/api/products")
+//   .then(res => res.json())
+//   .then(data => {
+//     // backend-safe (array OR {products})
+//     allProducts = Array.isArray(data) ? data : (data.products || []);
+//     renderProducts(allProducts);
+//   })
+//   .catch(err => {
+//     console.error("PRODUCT LOAD ERROR:", err);
+//   });
 
-  if (!wrapper.contains(e.target)) {
-    dropdown.classList.remove("show");
-  }
-});
+// /* ======================================================
+//    RENDER PRODUCTS
+// ====================================================== */
+// function renderProducts(products) {
+//   const grid = document.getElementById("productsGrid");
+//   if (!grid) return;
 
-/* ======================================================
-   LOGIN STATE (BACKEND CONNECTED)
-====================================================== */
-(function initAuthUI() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token");
+//   grid.innerHTML = "";
 
-  const accountName = document.getElementById("accountName");
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const dropdown = document.getElementById("accountDropdown");
+//   if (!products.length) {
+//     grid.innerHTML = "<p>No products found</p>";
+//     return;
+//   }
 
-  // Safety checks
-  if (!accountName || !loginBtn || !logoutBtn) return;
+//   products.forEach(p => {
+//     const imgUrl = p.image.startsWith("http")
+//       ? p.image
+//       : IMAGE_BASE + "/" + p.image; // 🔥 FIXED
 
-  if (user && token) {
-    // Display name priority: name → username → email
-    accountName.innerText =
-      user.name || user.username || user.email || "Account";
+//     const card = document.createElement("div");
+//     card.className = "product-card";
 
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "block";
+//     card.innerHTML = `
+//       <div class="product-img">
+//         <img 
+//           src="${imgUrl}" 
+//           alt="${p.name}"
+//           onerror="this.src='https://via.placeholder.com/300'"
+//         >
+//       </div>
 
-    // Optional: Admin link auto-show
-    if (user.role === "admin" || user.role === "superadmin") {
-      if (!document.getElementById("adminLink")) {
-        const adminLink = document.createElement("a");
-        adminLink.id = "adminLink";
-        adminLink.href = "admin-dashboard.html";
-        adminLink.innerText = "Admin Dashboard";
-        dropdown.insertBefore(adminLink, dropdown.firstChild);
-      }
-    }
-  } else {
-    // Not logged in
-    accountName.innerText = "Account";
-    loginBtn.style.display = "block";
-    logoutBtn.style.display = "none";
-  }
-})();
+//       <div class="product-info">
+//         <h3>${p.name}</h3>
+//         <p class="price">₹${p.price}</p>
 
-/* ======================================================
-   LOGOUT
-====================================================== */
-function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+//         <p class="stock ${p.stock > 0 ? 'in' : 'out'}">
+//           ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
+//         </p>
+//       </div>
+//     `;
 
-  // Close dropdown if open
-  const dropdown = document.getElementById("accountDropdown");
-  if (dropdown) dropdown.classList.remove("show");
+//     // 👉 Product detail page
+//     card.onclick = () => {
+//       window.location.href = `products.html?id=${p._id}`;
+//     };
 
-  // Redirect to login
-  window.location.href = "login.html";
-}
+//     grid.appendChild(card);
+//   });
+// }
+
+// /* ======================================================
+//    CATEGORY FILTER
+// ====================================================== */
+// function filterByCategory(category, btn) {
+//   document.querySelectorAll(".category-btn").forEach(b =>
+//     b.classList.remove("active")
+//   );
+//   btn.classList.add("active");
+
+//   if (category === "all") {
+//     renderProducts(allProducts);
+//   } else {
+//     renderProducts(
+//       allProducts.filter(p => p.category === category)
+//     );
+//   }
+// }
+
+// /* ======================================================
+//    SEARCH PRODUCTS
+// ====================================================== */
+// function searchProducts() {
+//   const input = document.getElementById("searchInput");
+//   if (!input) return;
+
+//   const keyword = input.value.toLowerCase().trim();
+
+//   if (!keyword) {
+//     renderProducts(allProducts);
+//     return;
+//   }
+
+//   renderProducts(
+//     allProducts.filter(p =>
+//       p.name.toLowerCase().includes(keyword)
+//     )
+//   );
+// }

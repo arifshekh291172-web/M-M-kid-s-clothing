@@ -2,22 +2,25 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  getProducts,
-  getProductById
+  addProduct,
+  updateProduct,
+  deleteProduct
 } = require("../controllers/productController");
 
+const adminAuth = require("../middleware/adminAuth");
+
 /* ======================================================
-   PUBLIC PRODUCT ROUTES
-   Base path: /api/products
+   ADMIN PRODUCT ROUTES
+   Base path: /api/admin/products
 ====================================================== */
 
-// 🔹 GET ALL PRODUCTS
-// Example: GET /api/products
-router.get("/", getProducts);
+// 🔹 ADD PRODUCT (BASE64)
+router.post("/products", adminAuth, addProduct);
 
-// 🔹 GET SINGLE PRODUCT BY ID
-// Example: GET /api/products/:id
-// ⚠️ Always LAST (dynamic route)
-router.get("/:id", getProductById);
+// 🔹 UPDATE PRODUCT
+router.put("/products/:id", adminAuth, updateProduct);
+
+// 🔹 DELETE / DEACTIVATE PRODUCT
+router.delete("/products/:id", adminAuth, deleteProduct);
 
 module.exports = router;

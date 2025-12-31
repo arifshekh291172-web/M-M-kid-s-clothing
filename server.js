@@ -23,21 +23,22 @@ const server = http.createServer(app);
 connectDB();
 
 /* ======================================================
-   GLOBAL MIDDLEWARES  🔥 VERY IMPORTANT
+   🔥 GLOBAL MIDDLEWARES (VERY IMPORTANT)
 ====================================================== */
 app.use(cors({ origin: "*" }));
 
-// 🔥 BASE64 IMAGE SUPPORT (MANDATORY)
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+// 🔥🔥 BASE64 IMAGE SUPPORT (THIS WAS THE MAIN ISSUE)
+// 10mb kabhi-kabhi kam padta hai → 25mb safe hai
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 /* ======================================================
-   STATIC FILES
+   STATIC FILES (OPTIONAL)
 ====================================================== */
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   ROOT HTML FILES
+   ROOT HTML FILES (OPTIONAL)
 ====================================================== */
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
@@ -58,7 +59,7 @@ const io = new Server(server, {
    API ROUTES
 ====================================================== */
 
-// USER
+// 🔹 USER / PUBLIC
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/cart", require("./routes/cartRoutes"));
@@ -66,9 +67,9 @@ app.use("/api/checkout", require("./routes/checkoutRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
 
-// ADMIN
+// 🔹 ADMIN (IMPORTANT)
 app.use("/api/admin/auth", require("./routes/adminAuthRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/admin", require("./routes/productRoutes")); // 🔥 FIXED
 
 /* ======================================================
    SOCKET.IO – LIVE CHAT

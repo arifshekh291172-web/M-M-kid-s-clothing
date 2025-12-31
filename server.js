@@ -23,28 +23,24 @@ const server = http.createServer(app);
 connectDB();
 
 /* ======================================================
-   🔥 GLOBAL MIDDLEWARES (VERY IMPORTANT)
+   GLOBAL MIDDLEWARES
 ====================================================== */
 app.use(cors({ origin: "*" }));
 
-// 🔥 BASE64 IMAGE SUPPORT
-app.use(express.json({ limit: "25mb" }));
-app.use(express.urlencoded({ extended: true, limit: "25mb" }));
+// 🔥 BASE64 IMAGE + LARGE PAYLOAD SUPPORT
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 /* ======================================================
-   STATIC FILES (OPTIONAL)
+   STATIC FILES
 ====================================================== */
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   ROOT HTML FILES (OPTIONAL)
+   ROOT ROUTES (OPTIONAL)
 ====================================================== */
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.get("/products.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "products.html"));
 });
 
 /* ======================================================
@@ -58,7 +54,7 @@ const io = new Server(server, {
    API ROUTES
 ====================================================== */
 
-// 🔹 USER / PUBLIC
+// 🔹 PUBLIC
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/cart", require("./routes/cartRoutes"));
@@ -66,9 +62,9 @@ app.use("/api/checkout", require("./routes/checkoutRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
 
-// 🔹 ADMIN (IMPORTANT – FIXED)
+// 🔹 ADMIN
 app.use("/api/admin/auth", require("./routes/adminAuthRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes")); // ✅ CORRECT
+app.use("/api/admin", require("./routes/adminRoutes"));
 
 /* ======================================================
    SOCKET.IO – LIVE CHAT
@@ -113,7 +109,7 @@ io.on("connection", socket => {
         message: aiReply
       });
     } catch (err) {
-      console.error("CHAT ERROR:", err);
+      console.error("CHAT ERROR:", err.message);
     }
   });
 
@@ -172,7 +168,7 @@ app.post("/api/support/ticket", async (req, res) => {
       ticketId: ticket._id
     });
   } catch (err) {
-    console.error("SUPPORT ERROR:", err);
+    console.error("SUPPORT ERROR:", err.message);
     res.status(500).json({
       success: false,
       message: "Internal server error"
@@ -181,7 +177,18 @@ app.post("/api/support/ticket", async (req, res) => {
 });
 
 /* ======================================================
-   404 HANDLER (ALWAYS LAST)
+   GLOBAL ERROR HANDLER (🔥 VERY IMPORTANT)
+====================================================== */
+app.use((err, req, res, next) => {
+  console.error("🔥 SERVER ERROR:", err.message);
+  res.status(500).json({
+    success: false,
+    message: err.message || "Server error"
+  });
+});
+
+/* ======================================================
+   404 HANDLER
 ====================================================== */
 app.use((req, res) => {
   res.status(404).json({

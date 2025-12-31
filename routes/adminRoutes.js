@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const adminAuth = require("../middleware/adminauth"); // ✅ correct middleware
+const adminAuth = require("../middleware/adminauth");
 
 const User = require("../models/User");
 const Order = require("../models/Order");
@@ -19,11 +19,8 @@ router.get("/users", adminAuth, async (req, res) => {
   try {
     const users = await User.find({ role: "user" }).select("-password");
     res.json({ success: true, users });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch users"
-    });
+  } catch {
+    res.status(500).json({ success: false, message: "Failed to fetch users" });
   }
 });
 
@@ -48,14 +45,7 @@ router.post("/orders/status", adminAuth, async (req, res) => {
   const { orderId, status } = req.body;
 
   const order = await Order.findById(orderId);
-  if (!order) {
-    return res.status(404).json({
-      success: false,
-      message: "Order not found"
-    });
-  }
-
-  const user = await User.findById(order.userId);
+  if (!order) return res.status(404).json({ success: false });
 
   order.status = status;
   order.statusHistory.push({ status });
@@ -67,10 +57,11 @@ router.post("/orders/status", adminAuth, async (req, res) => {
 
   await order.save();
 
+  const user = await User.findById(order.userId);
   await sendEmail(
     user.email,
     `Order Status Updated – ${status}`,
-    `<p>Your order <b>${order._id}</b> status is now <b>${status}</b></p>`
+    `<p>Your order <b>${order._id}</b> is now <b>${status}</b></p>`
   );
 
   res.json({ success: true });
@@ -83,12 +74,7 @@ router.post("/orders/refund", adminAuth, async (req, res) => {
   const { orderId, refundAmount, adminNote } = req.body;
 
   const order = await Order.findById(orderId);
-  if (!order) {
-    return res.status(404).json({
-      success: false,
-      message: "Order not found"
-    });
-  }
+  if (!order) return res.status(404).json({ success: false });
 
   order.status = "Refunded";
   order.paymentStatus = "Refunded";
@@ -109,12 +95,11 @@ router.post("/orders/refund", adminAuth, async (req, res) => {
   });
 
   await wallet.save();
-
   res.json({ success: true });
 });
 
 /* ======================================================
-   PRODUCTS (BASE64 IMAGE – ✅ CORRECT)
+   ✅ PRODUCTS (BASE64 – FINAL FIX)
 ====================================================== */
 router.post("/products", adminAuth, async (req, res) => {
   try {
@@ -127,12 +112,11 @@ router.post("/products", adminAuth, async (req, res) => {
       originalPrice,
       sizes,
       badge,
-      image,
-      images
+      mainImage,     // ✅ FIXED
+      extraImages    // ✅ FIXED
     } = req.body;
 
-    // 🔥 MAIN IMAGE REQUIRED
-    if (!image || !image.startsWith("data:image")) {
+    if (!mainImage || !mainImage.startsWith("data:image")) {
       return res.status(400).json({
         success: false,
         message: "Main image required"
@@ -148,26 +132,23 @@ router.post("/products", adminAuth, async (req, res) => {
       originalPrice: Number(originalPrice),
       sizes: sizes || [],
       badge: badge || "",
-      image,               // ✅ BASE64 STRING
-      images: images || [], // ✅ BASE64 ARRAY
+      image: mainImage,              // ✅ saved correctly
+      images: extraImages || [],     // ✅ saved correctly
       isActive: true
     });
 
-    res.status(201).json({
-      success: true,
-      product
-    });
+    res.status(201).json({ success: true, product });
   } catch (err) {
-    console.error("ADD PRODUCT ERROR:", err);
+    console.error("ADD PRODUCT ERROR:", err.message);
     res.status(500).json({
       success: false,
-      message: "Failed to add product"
+      message: err.message
     });
   }
 });
 
 /* ======================================================
-   PRODUCTS LIST (ADMIN)
+   PRODUCTS LIST
 ====================================================== */
 router.get("/products", adminAuth, async (req, res) => {
   const products = await Product.find().sort({ createdAt: -1 });
@@ -200,10 +181,7 @@ router.get("/analytics", adminAuth, async (req, res) => {
 
   res.json({
     success: true,
-    stats: {
-      orders: orders.length,
-      revenue
-    }
+    stats: { orders: orders.length, revenue }
   });
 });
 

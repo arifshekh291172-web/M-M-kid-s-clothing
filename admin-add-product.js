@@ -2,9 +2,10 @@
    ADMIN ADD PRODUCT (BASE64)
 ================================ */
 
-/* ===== ELEMENTS ===== */
+/* ===== SHORTCUT ===== */
 const el = id => document.getElementById(id);
 
+/* ===== FORM ELEMENTS ===== */
 const nameEl = el("name");
 const brandEl = el("brand");
 const categoryEl = el("category");
@@ -72,7 +73,7 @@ async function addProduct() {
   if (submitting) return;
   msgEl.innerText = "";
 
-  /* ===== ADMIN AUTH ===== */
+  /* ===== ADMIN TOKEN ===== */
   const token = localStorage.getItem("adminToken");
   if (!token) {
     alert("❌ Admin login required");
@@ -113,20 +114,30 @@ async function addProduct() {
   submitting = true;
 
   try {
-    /* ===== BASE64 CONVERSION ===== */
+    /* ===== MAIN IMAGE BASE64 ===== */
     const mainBase64 = await toBase64(mainImageEl.files[0]);
 
-    // Safety: very large image check (≈5MB base64)
-    if (mainBase64.length > 7_000_000) {
-      showError("Main image is too large. Please use a smaller image.");
+    if (!mainBase64.startsWith("data:image")) {
+      showError("Invalid image format");
       submitting = false;
       return;
     }
 
+    // 🔒 Size safety (~5–6MB)
+    if (mainBase64.length > 7_000_000) {
+      showError("Main image too large. Use smaller image.");
+      submitting = false;
+      return;
+    }
+
+    /* ===== EXTRA IMAGES ===== */
     const extraBase64 = [];
     if (extraImagesEl?.files?.length) {
       for (const file of extraImagesEl.files) {
-        extraBase64.push(await toBase64(file));
+        const b64 = await toBase64(file);
+        if (b64.startsWith("data:image")) {
+          extraBase64.push(b64);
+        }
       }
     }
 
@@ -165,7 +176,7 @@ async function addProduct() {
     const result = await res.json();
 
     if (res.ok && result.success) {
-      showSuccess("Product added successfully");
+      showSuccess("Product added successfully 🎉");
       clearForm();
     } else {
       showError(result.message || "Failed to add product");

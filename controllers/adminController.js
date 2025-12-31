@@ -1,17 +1,37 @@
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const Order = require("../models/Order");
 
-exports.getDashboardStats = async (req, res) => {
+exports.adminLogin = async (req, res) => {
   try {
-    const users = await User.countDocuments();
-    const orders = await Order.countDocuments();
+    const { email, password } = req.body;
+
+    const admin = await User.findOne({ email, role: "admin" });
+    if (!admin) {
+      return res.status(401).json({ message: "Admin not found" });
+    }
+
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // 🔥 TOKEN PAYLOAD (VERY IMPORTANT)
+    const token = jwt.sign(
+      {
+        id: admin._id,
+        role: "admin"
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.json({
       success: true,
-      stats: { users, orders }
+      token
     });
-  } catch {
-    res.json({ success: false, message: "Admin stats failed" });
+
+  } catch (err) {
+    console.error("ADMIN LOGIN ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
-

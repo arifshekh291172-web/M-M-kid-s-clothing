@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Terms & Conditions | M&M Kid's Wear</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #334155;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .08);
+        }
+
+        h1,
+        h2 {
+            color: var(--primary)
+        }
+
+        h2 {
+            margin-top: 28px
+        }
+
+        p,
+        li {
+            line-height: 1.7;
+            font-size: 15px
+        }
+
+        ul {
+            padding-left: 18px
+        }
+
+        .highlight {
+            background: #eff6ff;
+            border-left: 6px solid var(--accent);
+            padding: 16px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .lang-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- 🌐 LANGUAGE SWITCH -->
+        <div class="lang-bar">
+            <select id="langSelect" onchange="setLanguage(this.value)">
+                <option value="en">🌐 English</option>
+                <option value="hi">🇮🇳 Hindi</option>
+                <option value="mr">🟠 Marathi</option>
+            </select>
+        </div>
+
+        <h1 data-key="title"></h1>
+        <p><strong data-key="effective"></strong></p>
+
+        <p data-key="intro"></p>
+
+        <h2 data-key="useTitle"></h2>
+        <p data-key="useDesc"></p>
+
+        <h2 data-key="accountTitle"></h2>
+        <p data-key="accountDesc"></p>
+
+        <h2 data-key="ordersTitle"></h2>
+        <ul>
+            <li data-key="orders1"></li>
+            <li data-key="orders2"></li>
+            <li data-key="orders3"></li>
+        </ul>
+
+        <div class="highlight" data-key="refundNote"></div>
+
+        <h2 data-key="liabilityTitle"></h2>
+        <p data-key="liabilityDesc"></p>
+
+        <h2 data-key="changesTitle"></h2>
+        <p data-key="changesDesc"></p>
+
+    </div>
+
+    <script>
+        /* ===============================
+           TRANSLATIONS
+        ================================ */
+        const translations = {
+            en: {
+                title: "Terms & Conditions",
+                effective: "Effective Date: 2025",
+                intro: "These Terms & Conditions govern your use of the M&M Kid’s Wear website and services.",
+                useTitle: "Use of Website",
+                useDesc: "By accessing or using our website, you agree to comply with these terms and all applicable laws.",
+                accountTitle: "User Accounts",
+                accountDesc: "You are responsible for maintaining the confidentiality of your account and password.",
+                ordersTitle: "Orders & Payments",
+                orders1: "All orders are subject to availability and confirmation",
+                orders2: "Prices may change without prior notice",
+                orders3: "Only online payments are accepted (no Cash on Delivery)",
+                refundNote: "Refunds and exchanges are allowed only within 48 hours of delivery as per our policy.",
+                liabilityTitle: "Limitation of Liability",
+                liabilityDesc: "M&M Kid’s Wear shall not be liable for indirect, incidental, or consequential damages.",
+                changesTitle: "Changes to Terms",
+                changesDesc: "We reserve the right to update these terms at any time without prior notice."
+            },
+
+            hi: {
+                title: "नियम और शर्तें",
+                effective: "प्रभावी तिथि: 2025",
+                intro: "ये नियम और शर्तें M&M Kid’s Wear वेबसाइट और सेवाओं के उपयोग को नियंत्रित करती हैं।",
+                useTitle: "वेबसाइट का उपयोग",
+                useDesc: "वेबसाइट का उपयोग करके आप सभी नियमों और कानूनों से सहमत होते हैं।",
+                accountTitle: "यूज़र अकाउंट",
+                accountDesc: "अपने अकाउंट और पासवर्ड की सुरक्षा की जिम्मेदारी आपकी है।",
+                ordersTitle: "ऑर्डर और भुगतान",
+                orders1: "सभी ऑर्डर उपलब्धता पर निर्भर हैं",
+                orders2: "कीमतें बिना सूचना बदली जा सकती हैं",
+                orders3: "केवल ऑनलाइन भुगतान स्वीकार किया जाता है (COD नहीं)",
+                refundNote: "डिलीवरी के 48 घंटे के भीतर ही रिफंड या एक्सचेंज मान्य है।",
+                liabilityTitle: "जिम्मेदारी की सीमा",
+                liabilityDesc: "किसी भी अप्रत्यक्ष नुकसान के लिए कंपनी जिम्मेदार नहीं होगी।",
+                changesTitle: "नियमों में बदलाव",
+                changesDesc: "हम कभी भी नियमों में बदलाव करने का अधिकार रखते हैं।"
+            },
+
+            mr: {
+                title: "अटी व शर्ती",
+                effective: "प्रभावी दिनांक: 2025",
+                intro: "या अटी व शर्ती M&M Kid’s Wear वेबसाइट व सेवांच्या वापरावर लागू होतात.",
+                useTitle: "वेबसाइटचा वापर",
+                useDesc: "वेबसाइट वापरून तुम्ही सर्व नियम व कायदे मान्य करता.",
+                accountTitle: "वापरकर्ता खाते",
+                accountDesc: "तुमच्या खात्याची आणि पासवर्डची जबाबदारी तुमची आहे.",
+                ordersTitle: "ऑर्डर व पेमेंट",
+                orders1: "सर्व ऑर्डर उपलब्धतेवर अवलंबून आहेत",
+                orders2: "किंमती कोणतीही पूर्वसूचना न देता बदलू शकतात",
+                orders3: "फक्त ऑनलाइन पेमेंट स्वीकारले जाते (COD नाही)",
+                refundNote: "डिलिव्हरीनंतर 48 तासांतच परतावा किंवा एक्सचेंज मान्य आहे.",
+                liabilityTitle: "जबाबदारी मर्यादा",
+                liabilityDesc: "अप्रत्यक्ष नुकसानासाठी कंपनी जबाबदार राहणार नाही.",
+                changesTitle: "अटींमध्ये बदल",
+                changesDesc: "आम्ही कोणत्याही वेळी अटी बदलू शकतो."
+            }
+        };
+
+        /* ===============================
+           LANGUAGE FUNCTIONS
+        ================================ */
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            document.querySelectorAll("[data-key]").forEach(el => {
+                el.innerText = t[el.dataset.key];
+            });
+            localStorage.setItem("siteLang", lang);
+            document.getElementById("langSelect").value = lang;
+        }
+
+        function setLanguage(lang) {
+            applyLanguage(lang);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            applyLanguage(localStorage.getItem("siteLang") || "en");
+        });
+    </script>
+
+</body>
+
+</html>

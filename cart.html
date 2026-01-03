@@ -8,22 +8,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
+    * {
+      box-sizing: border-box;
+      font-family: Inter, sans-serif;
+    }
+
     body {
       margin: 0;
-      font-family: Inter, sans-serif;
       background: #f5f7fb;
       color: #0f172a;
     }
 
+    /* ================= HEADER ================= */
     header {
       background: #0f172a;
       color: #fff;
       padding: 16px 24px;
-      font-size: 18px;
-      font-weight: 700;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-size: 18px;
+      font-weight: 700;
     }
 
     .cart-badge {
@@ -34,6 +39,7 @@
       margin-left: 6px;
     }
 
+    /* ================= CONTAINER ================= */
     .container {
       max-width: 1000px;
       margin: 30px auto;
@@ -42,73 +48,98 @@
 
     .card {
       background: #fff;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
       margin-bottom: 20px;
     }
 
+    /* ================= CART ITEM ================= */
     .cart-item {
       display: flex;
       gap: 16px;
-      border-bottom: 1px solid #e5e7eb;
       padding: 16px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
     }
 
     .cart-item img {
       width: 90px;
       height: 90px;
-      border-radius: 10px;
+      border-radius: 12px;
       object-fit: cover;
     }
 
     .cart-item h4 {
       margin: 0 0 6px;
-    }
-
-    .actions {
-      margin-top: 8px;
-      display: flex;
-      gap: 14px;
-    }
-
-    .actions span {
-      color: #2563eb;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .actions span.remove {
-      color: #ef4444;
-    }
-
-    .total {
-      font-size: 20px;
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    button {
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: 700;
-      cursor: pointer;
       font-size: 16px;
     }
 
-    .primary {
+    .cart-item p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid #cbd5f5;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .remove {
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* ================= SUMMARY ================= */
+    .total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
       background: #fb641b;
       color: #fff;
-      width: 100%;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     .empty {
       text-align: center;
-      color: #64748b;
       padding: 40px 0;
+      color: #64748b;
+      font-size: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -124,21 +155,25 @@
 
 <div class="container">
 
+  <!-- CART ITEMS -->
   <div class="card" id="cartContainer"></div>
 
+  <!-- SUMMARY -->
   <div class="card">
     <div class="total">
       <span>Total</span>
       <span id="totalAmount">₹0</span>
     </div>
-    <br>
-    <button class="primary" onclick="goCheckout()">Proceed to Checkout</button>
+    <button class="checkout-btn" onclick="goCheckout()">
+      Proceed to Checkout
+    </button>
   </div>
 
 </div>
 
 <script>
-/* ================= LOAD CART ================= */
+/* ================= CART LOGIC ================= */
+
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function loadCart() {
@@ -147,27 +182,27 @@ function loadCart() {
   let total = 0;
 
   if (!cart.length) {
-    box.innerHTML = `<div class="empty">Your cart is empty</div>`;
+    box.innerHTML = `<div class="empty">Your cart is empty 🛒</div>`;
     document.getElementById("totalAmount").innerText = "₹0";
     updateBadge();
     return;
   }
 
-  cart.forEach((i, index) => {
-    total += i.price * i.qty;
+  cart.forEach((item, index) => {
+    total += item.price * item.qty;
 
     box.innerHTML += `
       <div class="cart-item">
-        <img src="${i.image}">
+        <img src="${item.image}">
         <div>
-          <h4>${i.name}</h4>
-          <p>Size: ${i.size}</p>
-          <p>₹${i.price} × ${i.qty}</p>
+          <h4>${item.name}</h4>
+          <p>Size: ${item.size}</p>
+          <p>₹${item.price} × ${item.qty}</p>
 
           <div class="actions">
-            <span onclick="changeQty(${index}, -1)">-</span>
-            <span>${i.qty}</span>
-            <span onclick="changeQty(${index}, 1)">+</span>
+            <button class="qty-btn" onclick="changeQty(${index}, -1)">−</button>
+            <strong>${item.qty}</strong>
+            <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
             <span class="remove" onclick="removeItem(${index})">Remove</span>
           </div>
         </div>
@@ -201,8 +236,25 @@ function updateBadge() {
   document.getElementById("cartCount").innerText = count;
 }
 
+/* ================= CHECKOUT ================= */
 function goCheckout() {
-  alert("Next step: checkout + order API");
+  if (!cart.length) {
+    alert("Your cart is empty");
+    return;
+  }
+
+  // 🔐 LOGIN CHECK
+  const user = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+
+  if (!user || !token) {
+    alert("Please login to continue checkout");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // ✅ Logged in → allow checkout
+  window.location.href = "checkout.html";
 }
 
 loadCart();

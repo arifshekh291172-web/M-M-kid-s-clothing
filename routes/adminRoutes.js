@@ -1,7 +1,11 @@
+const adminAuth = require("../middleware/authMiddleware");
+// OR
+// const adminAuth = require("../middleware/adminauth");
+
 const express = require("express");
 const router = express.Router();
 
-const adminAuth = require("../middleware/adminauth");
+// const adminAuth = require("../middleware/adminauth");
 
 const User = require("../models/User");
 const Order = require("../models/Order");

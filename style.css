@@ -906,48 +906,126 @@ footer {
     }
 }
 
+/* ===============================
+   ACCOUNT WRAPPER
+================================ */
 .account-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
+/* ===============================
+   ACCOUNT BUTTON
+================================ */
 .account-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     background: none;
     border: none;
     cursor: pointer;
     font: inherit;
+    color: #0f172a;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
 }
 
+.account-btn:hover {
+    background: #f1f5f9;
+}
+
+/* ===============================
+   ACCOUNT DROPDOWN
+================================ */
 .account-dropdown {
     position: absolute;
-    top: 110%;
+    top: calc(100% + 10px);
     right: 0;
-    width: 200px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
+    width: 220px;
+
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+
     display: none;
     flex-direction: column;
     z-index: 1000;
     overflow: hidden;
+
+    /* animation */
+    transform: translateY(-6px);
+    opacity: 0;
+    transition: all 0.2s ease;
 }
 
+/* visible state */
+.account-dropdown.show {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ===============================
+   DROPDOWN LINKS
+================================ */
 .account-dropdown a {
-    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px 16px;
     text-decoration: none;
     color: #0f172a;
     font-size: 14px;
     font-weight: 500;
+
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .account-dropdown a:hover {
-    background: #f1f5f9;
+    background: #f8fafc;
+    color: #0f172a;
 }
 
+/* ===============================
+   ICONS INSIDE DROPDOWN
+================================ */
+.account-dropdown .material-icon {
+    font-size: 20px;
+    color: #475569;
+}
+
+/* ===============================
+   DIVIDER
+================================ */
 .account-dropdown hr {
     margin: 6px 0;
     border: none;
     border-top: 1px solid #e5e7eb;
 }
-.account-dropdown.show {
-    display: flex;
+
+/* ===============================
+   LOGOUT (OPTIONAL HIGHLIGHT)
+================================ */
+#logoutBtn {
+    color: #dc2626;
+}
+
+#logoutBtn:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ===============================
+   MOBILE FRIENDLY
+================================ */
+@media (max-width: 768px) {
+    .account-dropdown {
+        right: auto;
+        left: 0;
+        width: 100%;
+        min-width: 220px;
+    }
 }

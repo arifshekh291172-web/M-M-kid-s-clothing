@@ -16,6 +16,19 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
+        /* .account-wrapper {
+            position: relative;
+        }
+
+        .account-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            z-index: 9999;
+            background: #fff;
+        } */
+
         .material-icon {
             font-family: 'Material Symbols Rounded';
             font-size: 22px;
@@ -41,7 +54,7 @@
         <div class="header-top">
             <div class="container">
                 <div>📦 Free shipping on orders above ₹999</div>
-                <div>🎉 Get 20% off on first order - Use code: FIRST20</div>
+                <div>🎉Welcome To M&M Kid🧑</div>
             </div>
         </div>
 
@@ -65,7 +78,7 @@
 
                     <!-- ACCOUNT -->
                     <div class="account-wrapper">
-                        <button class="nav-link account-btn" onclick="toggleAccount()">
+                        <button class="nav-link account-btn" onclick="toggleAccount(event)">
                             <span class="material-icon">account_circle</span>
                             <span id="accountName">Account</span>
                         </button>
@@ -81,13 +94,16 @@
                             </a>
                         </div>
                     </div>
+                    <a href="cart.html">
 
-                    <!-- CART -->
-                    <div class="nav-link" onclick="toggleCart()">
-                        <span class="material-icon">shopping_cart</span>
-                        Cart
-                        <span class="cart-badge" id="cartCount">0</span>
-                    </div>
+                        <!-- CART -->
+                        <div class="nav-link" onclick="toggleCart()">
+                            <span class="material-icon">shopping_cart</span>
+                            Cart
+                            <span class="cart-badge" id="cartCount">0</span>
+                        </div>
+
+                    </a>
 
                     <!-- ADMIN -->
                     <a href="admin-dashboard.html" class="nav-link" title="Admin Panel">
@@ -135,7 +151,7 @@
 
                 <div class="banner-slide">
                     <div class="banner-content">
-                        <h1>Winter Collection 2024</h1>
+                        <h1>Winter Collection 2025</h1>
                         <p>Stay warm and stylish with our latest winter arrivals.</p>
                         <button class="banner-btn" onclick="filterByCategory('winter')">
                             Shop Now
@@ -186,7 +202,7 @@
     <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
             <h2>Shopping Cart</h2>
-            <button class="close-cart" onclick="toggleCart()">×</button>
+            <!-- <button class="close-cart" onclick="toggleCart()">×</button> -->
         </div>
         <div class="cart-items" id="cartItems"></div>
         <div class="cart-footer" id="cartFooter" style="display:none;">
@@ -202,11 +218,83 @@
 
     <footer>
         <div class="container">
-            <div class="footer-bottom">
-                <p>&copy; 2024 M&M Kid's Wear. All rights reserved.</p>
+
+            <div class="footer-content">
+
+                <!-- ABOUT -->
+                <div class="footer-section">
+                    <h3>M&M Kid's Wear</h3>
+                    <p>
+                        Premium kids clothing brand bringing comfort, style, and warmth
+                        for your little ones. Trusted quality at the best prices.
+                    </p>
+                </div>
+
+                <!-- CUSTOMER SERVICE -->
+                <div class="footer-section">
+                    <h3>Customer Service</h3>
+                    <ul class="footer-links">
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="order-tracking.html">Track Order</a></li>
+                        <li><a href="refund-exchange.html">Return & Refund</a></li>
+                        <li><a href="size-guide.html">Size Guide</a></li>
+                    </ul>
+                </div>
+
+                <!-- QUICK LINKS -->
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="profile.html">My Account</a></li>
+                        <li><a href="wishlist.html">Wishlist</a></li>
+                        <li><a href="my-orders.html">My Orders</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-conditions.html">Terms & Conditions</a></li>
+                        <li><a href="shipping-policy.html">Shipping Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- SOCIAL -->
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <ul class="footer-links social-links">
+                        <li>
+                            <a href="https://facebook.com" target="_blank">
+                                <span class="material-icon">facebook</span> Facebook
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://instagram.com" target="_blank">
+                                <span class="material-icon">photo_camera</span> Instagram
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://wa.me/91XXXXXXXXXX" target="_blank">
+                                <span class="material-icon">chat</span> WhatsApp
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:support@mmkidswear.com">
+                                <span class="material-icon">alternate_email</span> Email
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
+
+            <!-- FOOTER BOTTOM -->
+            <div class="footer-bottom">
+                <p>
+                    &copy; 2025 M&M Kid's Wear. All rights reserved. |
+                    <a href="privacy-policy.html">Privacy Policy</a> |
+                    <a href="refund-exchange.html">Refund & Exchange</a>
+                </p>
+            </div>
+
         </div>
     </footer>
+
 
     <!-- ================= JS ================= -->
     <script src="config.js"></script>

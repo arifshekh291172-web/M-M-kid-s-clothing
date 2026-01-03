@@ -1,0 +1,33 @@
+<header class="bg-slate-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+
+        <a href="index.html" class="text-xl font-bold">
+            M&M Kid’s Wear
+        </a>
+
+        <nav class="hidden md:flex gap-6 font-medium">
+            <a href="privacy-policy.html" class="hover:text-blue-400">Privacy</a>
+            <a href="terms-conditions.html" class="hover:text-blue-400">Terms</a>
+            <a href="shipping-policy.html" class="hover:text-blue-400">Shipping</a>
+            <a href="refund-exchange.html" class="hover:text-blue-400">Refund</a>
+        </nav>
+
+        <!-- 🌐 Language Switch -->
+        <div class="relative">
+            <button onclick="toggleLangMenu()"
+                class="flex items-center gap-2 bg-slate-800 px-3 py-2 rounded-lg text-sm">
+                🌐 <span id="currentLang">EN</span>
+            </button>
+
+            <div id="langMenu" class="hidden absolute right-0 mt-2 bg-white text-black rounded-lg shadow w-40">
+                <button onclick="setLang('en')"
+                    class="block w-full px-4 py-2 hover:bg-gray-100 text-left">English</button>
+                <button onclick="setLang('hi')"
+                    class="block w-full px-4 py-2 hover:bg-gray-100 text-left">हिंदी</button>
+                <button onclick="setLang('mr')"
+                    class="block w-full px-4 py-2 hover:bg-gray-100 text-left">मराठी</button>
+            </div>
+        </div>
+
+    </div>
+</header>

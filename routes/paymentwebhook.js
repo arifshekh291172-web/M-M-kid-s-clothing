@@ -7,55 +7,112 @@ const Payment = require("../models/Payment");
 const router = express.Router();
 
 /* ======================================================
-   RAZORPAY WEBHOOK
+   RAZORPAY WEBHOOK (SECURE)
+   URL: /api/webhook/razorpay
 ====================================================== */
 router.post(
   "/razorpay",
   express.raw({ type: "application/json" }),
   async (req, res) => {
     try {
-      const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+      const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
-      const signature = req.headers["x-razorpay-signature"];
+      /* 🔐 VERIFY SIGNATURE */
+      const razorpaySignature = req.headers["x-razorpay-signature"];
       const body = req.body.toString();
 
-      const expected = crypto
-        .createHmac("sha256", secret)
+      const expectedSignature = crypto
+        .createHmac("sha256", webhookSecret)
         .update(body)
         .digest("hex");
 
-      if (signature !== expected) {
-        return res.status(400).json({ message: "Invalid signature" });
+      if (razorpaySignature !== expectedSignature) {
+        console.error("❌ Razorpay Webhook: Invalid signature");
+        return res.status(400).json({ success: false });
       }
 
       const event = JSON.parse(body);
 
-      /* PAYMENT SUCCESS */
+      /* ======================================================
+         PAYMENT CAPTURED (SUCCESS)
+      ====================================================== */
       if (event.event === "payment.captured") {
-        const paymentId = event.payload.payment.entity.id;
-        const rpOrderId = event.payload.payment.entity.order_id;
+        const paymentEntity = event.payload.payment.entity;
+
+        const razorpayOrderId = paymentEntity.order_id;
+        const razorpayPaymentId = paymentEntity.id;
+        const amountPaid = paymentEntity.amount / 100;
 
         const payment = await Payment.findOne({
-          razorpayOrderId: rpOrderId
+          razorpayOrderId
         });
 
-        if (!payment) return res.json({ received: true });
+        if (!payment) {
+          return res.json({ received: true });
+        }
 
-        payment.razorpayPaymentId = paymentId;
+        /* UPDATE PAYMENT */
         payment.status = "PAID";
+        payment.razorpayPaymentId = razorpayPaymentId;
+        payment.paidAmount = amountPaid;
+        payment.webhookVerified = true;
+        payment.paidAt = new Date();
         await payment.save();
 
+        /* UPDATE ORDER */
         await Order.findByIdAndUpdate(payment.orderId, {
           paymentStatus: "Paid",
-          status: "Confirmed"
+          status: "Confirmed",
+          paymentId: razorpayPaymentId,
+          paidAt: new Date()
         });
+
+        console.log("✅ Payment confirmed via webhook");
       }
 
-      res.json({ status: "ok" });
+      /* ======================================================
+         PAYMENT FAILED
+      ====================================================== */
+      if (event.event === "payment.failed") {
+        const paymentEntity = event.payload.payment.entity;
+
+        const razorpayOrderId = paymentEntity.order_id;
+
+        await Payment.findOneAndUpdate(
+          { razorpayOrderId },
+          {
+            status: "FAILED",
+            failureReason: paymentEntity.error_description
+          }
+        );
+
+        console.log("❌ Payment failed via webhook");
+      }
+
+      /* ======================================================
+         REFUND PROCESSED (OPTIONAL TRACKING)
+      ====================================================== */
+      if (event.event === "refund.processed") {
+        const refundEntity = event.payload.refund.entity;
+
+        await Payment.findOneAndUpdate(
+          { razorpayPaymentId: refundEntity.payment_id },
+          {
+            status: "REFUNDED",
+            refundId: refundEntity.id,
+            refundAmount: refundEntity.amount / 100,
+            refundedAt: new Date()
+          }
+        );
+
+        console.log("💰 Refund processed via webhook");
+      }
+
+      return res.json({ success: true });
 
     } catch (err) {
-      console.error("WEBHOOK ERROR:", err);
-      res.status(500).json({ message: "Webhook failed" });
+      console.error("🔥 RAZORPAY WEBHOOK ERROR:", err);
+      return res.status(500).json({ success: false });
     }
   }
 );

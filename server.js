@@ -23,11 +23,17 @@ const server = http.createServer(app);
 connectDB();
 
 /* ======================================================
+   🔥 RAZORPAY WEBHOOK (MUST BE BEFORE express.json)
+   NOTE: This route uses express.raw internally
+====================================================== */
+app.use("/api/payments", require("./routes/paymentRoutes"));
+
+/* ======================================================
    GLOBAL MIDDLEWARES
 ====================================================== */
 app.use(cors({ origin: "*" }));
 
-// 🔥 BASE64 IMAGE + LARGE PAYLOAD SUPPORT
+// JSON & LARGE PAYLOAD SUPPORT (BASE64 images, etc.)
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
@@ -37,7 +43,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ======================================================
-   ROOT ROUTES (OPTIONAL)
+   ROOT ROUTE
 ====================================================== */
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
@@ -67,7 +73,7 @@ app.use("/api/admin/auth", require("./routes/adminAuthRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 
 /* ======================================================
-   SOCKET.IO – LIVE CHAT
+   SOCKET.IO – LIVE SUPPORT CHAT
 ====================================================== */
 io.on("connection", socket => {
   console.log("🟢 Socket Connected:", socket.id);
@@ -177,7 +183,7 @@ app.post("/api/support/ticket", async (req, res) => {
 });
 
 /* ======================================================
-   GLOBAL ERROR HANDLER (🔥 VERY IMPORTANT)
+   GLOBAL ERROR HANDLER
 ====================================================== */
 app.use((err, req, res, next) => {
   console.error("🔥 SERVER ERROR:", err.message);

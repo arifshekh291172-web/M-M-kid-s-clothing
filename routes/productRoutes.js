@@ -5,11 +5,11 @@ const Product = require("../models/Product");
 const adminAuth = require("../middleware/authMiddleware");
 
 /* ======================================================
-   ✅ PUBLIC ROUTES (USER SIDE)
-   Base path: /api/products
+   PUBLIC ROUTES (USER SIDE)
+   Base URL: /api/products
 ====================================================== */
 
-// 🔹 GET ALL ACTIVE PRODUCTS
+/* 🔹 GET ALL ACTIVE PRODUCTS */
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find({ isActive: true })
@@ -20,6 +20,7 @@ router.get("/", async (req, res) => {
       products
     });
   } catch (err) {
+    console.error("GET PRODUCTS ERROR:", err);
     res.status(500).json({
       success: false,
       message: "Failed to fetch products"
@@ -27,7 +28,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 🔹 GET SINGLE PRODUCT
+/* 🔹 GET SINGLE PRODUCT */
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -52,11 +53,11 @@ router.get("/:id", async (req, res) => {
 });
 
 /* ======================================================
-   ✅ ADMIN ROUTES
-   Base path: /api/admin/products
+   ADMIN ROUTES
+   Base URL: /api/admin/products
 ====================================================== */
 
-// 🔹 ADD PRODUCT (BASE64)
+/* 🔹 ADD PRODUCT (BASE64 IMAGE) */
 router.post("/", adminAuth, async (req, res) => {
   try {
     const {
@@ -84,8 +85,8 @@ router.post("/", adminAuth, async (req, res) => {
       brand: brand || "",
       category: category.trim(),
       description: description || "",
-      price,
-      originalPrice,
+      price: Number(price),
+      originalPrice: Number(originalPrice),
       sizes: sizes || [],
       badge: badge || "",
       image,
@@ -106,16 +107,16 @@ router.post("/", adminAuth, async (req, res) => {
   }
 });
 
-// 🔹 UPDATE PRODUCT
+/* 🔹 UPDATE PRODUCT */
 router.put("/:id", adminAuth, async (req, res) => {
   try {
-    const updated = await Product.findByIdAndUpdate(
+    const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
 
-    if (!updated) {
+    if (!updatedProduct) {
       return res.status(404).json({
         success: false,
         message: "Product not found"
@@ -124,9 +125,10 @@ router.put("/:id", adminAuth, async (req, res) => {
 
     res.json({
       success: true,
-      product: updated
+      product: updatedProduct
     });
   } catch (err) {
+    console.error("UPDATE PRODUCT ERROR:", err);
     res.status(500).json({
       success: false,
       message: "Failed to update product"
@@ -134,7 +136,7 @@ router.put("/:id", adminAuth, async (req, res) => {
   }
 });
 
-// 🔹 DELETE (SOFT DELETE)
+/* 🔹 DELETE PRODUCT (SOFT DELETE) */
 router.delete("/:id", adminAuth, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -151,9 +153,10 @@ router.delete("/:id", adminAuth, async (req, res) => {
 
     res.json({
       success: true,
-      message: "Product deactivated"
+      message: "Product removed successfully"
     });
   } catch (err) {
+    console.error("DELETE PRODUCT ERROR:", err);
     res.status(500).json({
       success: false,
       message: "Failed to delete product"

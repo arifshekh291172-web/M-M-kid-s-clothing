@@ -1,315 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Checkout | M&M Kid's Wear</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Checkout | M&M Kid's Wear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-body{
-  margin:0;
-  font-family:Inter;
-  background:#f5f7fb;
-  color:#0f172a;
-}
-header{
-  background:#0f172a;
-  color:#fff;
-  padding:16px 24px;
-  font-size:18px;
-  font-weight:700;
-}
-.container{
-  max-width:1100px;
-  margin:20px auto;
-  display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:20px;
-}
-.card{
-  background:#fff;
-  border-radius:14px;
-  padding:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,.06);
-}
-h2{margin-top:0}
-.address{
-  border:1px solid #e5e7eb;
-  border-radius:10px;
-  padding:14px;
-  margin-bottom:12px;
-  cursor:pointer;
-}
-.address.active{
-  border-color:#2563eb;
-  background:#eff6ff;
-}
-.address small{color:#64748b}
-.address-actions{
-  margin-top:8px;
-  display:flex;
-  gap:8px;
-}
-button{
-  border:none;
-  padding:10px 14px;
-  border-radius:10px;
-  font-weight:600;
-  cursor:pointer;
-}
-.primary{background:#2563eb;color:#fff}
-.secondary{background:#e5e7eb}
-.danger{background:#ef4444;color:#fff}
-.order-item{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
-.total{
-  font-size:20px;
-  font-weight:700;
-}
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000;
-}
-.modal-content{
-  background:#fff;
-  padding:20px;
-  width:400px;
-  border-radius:14px;
-}
-input{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #e5e7eb;
-}
-</style>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Inter
+    }
+
+    body {
+      margin: 0;
+      background: #f5f7fb;
+      color: #0f172a
+    }
+
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 20px auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+    }
+
+    h2 {
+      margin-top: 0
+    }
+
+    .address {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .address.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .address small {
+      color: #64748b
+    }
+
+    .address-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px
+    }
+
+    button {
+      border: none;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #2563eb;
+      color: #fff
+    }
+
+    .secondary {
+      background: #e5e7eb
+    }
+
+    .danger {
+      background: #ef4444;
+      color: #fff
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .total {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      width: 400px;
+      border-radius: 16px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    @media(max-width:800px) {
+      .container {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header>Checkout</header>
+  <header>Checkout</header>
 
-<div class="container">
+  <div class="container">
 
-  <!-- LEFT -->
-  <div>
-    <div class="card">
-      <h2>Select Delivery Address</h2>
-      <div id="addressList"></div>
-      <button class="secondary" onclick="openModal()">+ Add New Address</button>
-    </div>
-  </div>
-
-  <!-- RIGHT -->
-  <div>
-    <div class="card">
-      <h2>Order Summary</h2>
-      <div id="cartItems"></div>
-      <hr>
-      <div class="order-item total">
-        <span>Total</span>
-        <span id="totalAmount">₹0</span>
+    <!-- LEFT -->
+    <div>
+      <div class="card">
+        <h2>Delivery Address</h2>
+        <div id="addressList"></div>
+        <button class="secondary" onclick="openModal()">+ Add New Address</button>
       </div>
-      <br>
-      <button class="primary" style="width:100%" onclick="placeOrder()">
-        Place Order (COD)
-      </button>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card">
+        <h2>Order Summary</h2>
+        <div id="cartItems"></div>
+        <hr>
+        <div class="order-item total">
+          <span>Total</span>
+          <span id="totalAmount">₹0</span>
+        </div>
+        <br>
+        <button class="primary" style="width:100%" onclick="payNow()">
+          Pay Securely
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ADDRESS MODAL -->
+  <div class="modal" id="addressModal">
+    <div class="modal-content">
+      <h3 id="modalTitle">Add Address</h3>
+      <input id="name" placeholder="Name">
+      <input id="phone" placeholder="Phone">
+      <input id="line1" placeholder="Address Line 1">
+      <input id="line2" placeholder="Address Line 2">
+      <input id="city" placeholder="City">
+      <input id="state" placeholder="State">
+      <input id="pincode" placeholder="Pincode">
+      <button class="primary" onclick="saveAddress()">Save</button>
+      <button class="secondary" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 
-</div>
+  <script>
+    /* ================= CART ================= */
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let addresses = JSON.parse(localStorage.getItem("addresses")) || [];
+    let selectedAddress = null;
+    let editingIndex = null;
 
-<!-- ADD / EDIT ADDRESS MODAL -->
-<div class="modal" id="addressModal">
-  <div class="modal-content">
-    <h3 id="modalTitle">Add Address</h3>
-    <input id="name" placeholder="Name">
-    <input id="phone" placeholder="Phone">
-    <input id="line1" placeholder="Address Line 1">
-    <input id="line2" placeholder="Address Line 2">
-    <input id="city" placeholder="City">
-    <input id="state" placeholder="State">
-    <input id="pincode" placeholder="Pincode">
-    <button class="primary" onclick="saveAddress()">Save</button>
-    <button class="secondary" onclick="closeModal()">Cancel</button>
-  </div>
-</div>
+    function loadCart() {
+      cartItems.innerHTML = "";
+      let total = 0;
 
-<script>
-const API="https://m-m-kid-s-clothing.onrender.com";
-const token=localStorage.getItem("token");
-let selectedAddress=null;
-let editingAddressId=null;
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
-
-if(!token) location.href="login.html";
-
-/* ---------------- CART ---------------- */
-function loadCart(){
-  let total=0;
-  cartItems.innerHTML="";
-  cart.forEach(i=>{
-    cartItems.innerHTML+=`
+      cart.forEach(i => {
+        cartItems.innerHTML += `
       <div class="order-item">
-        <span>${i.name} × ${i.quantity}</span>
-        <span>₹${i.price*i.quantity}</span>
+        <span>${i.name} (${i.size}) × ${i.qty}</span>
+        <span>₹${i.price * i.qty}</span>
       </div>`;
-    total+=i.price*i.quantity;
-  });
-  totalAmount.innerText="₹"+total;
-}
-loadCart();
+        total += i.price * i.qty;
+      });
 
-/* ---------------- ADDRESSES ---------------- */
-async function loadAddresses(){
-  const res=await fetch(API+"/api/checkout/address",{
-    headers:{Authorization:token}
-  });
-  const addresses=await res.json();
+      totalAmount.innerText = "₹" + total;
+    }
+    loadCart();
 
-  addressList.innerHTML="";
-  selectedAddress=null;
-
-  addresses.forEach(a=>{
-    addressList.innerHTML+=`
-      <div class="address ${a.isDefault?'active':''}"
-           onclick="selectAddress('${a._id}',this)">
+    /* ================= ADDRESSES ================= */
+    function loadAddresses() {
+      addressList.innerHTML = "";
+      addresses.forEach((a, i) => {
+        addressList.innerHTML += `
+      <div class="address ${selectedAddress === i ? 'active' : ''}"
+        onclick="selectAddress(${i},this)">
         <strong>${a.name}</strong> (${a.phone})<br>
-        <small>${a.addressLine1}, ${a.city} - ${a.pincode}</small>
-
+        <small>${a.line1}, ${a.city} - ${a.pincode}</small>
         <div class="address-actions">
-          <button class="secondary" onclick="editAddress('${a._id}',event)">Edit</button>
-          <button class="danger" onclick="deleteAddress('${a._id}',event)">Delete</button>
+          <button class="secondary" onclick="editAddress(${i},event)">Edit</button>
+          <button class="danger" onclick="deleteAddress(${i},event)">Delete</button>
         </div>
       </div>`;
-    if(a.isDefault) selectedAddress=a._id;
-  });
-}
-loadAddresses();
+      });
+    }
+    loadAddresses();
 
-function selectAddress(id,el){
-  document.querySelectorAll(".address").forEach(a=>a.classList.remove("active"));
-  el.classList.add("active");
-  selectedAddress=id;
-}
+    function selectAddress(i, el) {
+      document.querySelectorAll(".address").forEach(a => a.classList.remove("active"));
+      el.classList.add("active");
+      selectedAddress = i;
+    }
 
-/* ---------------- PLACE ORDER ---------------- */
-async function placeOrder(){
-  if(!selectedAddress) return alert("Please select an address");
-
-  const res=await fetch(API+"/api/checkout/place-order",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:token
-    },
-    body:JSON.stringify({
-      cartItems:cart.map(c=>({productId:c._id,quantity:c.quantity})),
-      addressId:selectedAddress,
-      paymentMethod:"COD"
-    })
-  });
-
-  const data=await res.json();
-  if(data.success){
-    localStorage.removeItem("cart");
-    location.href="order-success.html";
-  }else{
-    alert(data.message || "Checkout failed");
+    /* ================= PAYMENT ================= */
+   function payNow() {
+  if (!cart.length) {
+    alert("Cart is empty");
+    return;
   }
+
+  if (selectedAddress === null) {
+    alert("Please select delivery address");
+    return;
+  }
+
+  // 🔐 LOGIN CHECK (important)
+  const user = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+
+  if (!user || !token) {
+    alert("Please login to continue payment");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // ✅ Save checkout data for payment page
+  localStorage.setItem("checkoutAddress", JSON.stringify(addresses[selectedAddress]));
+  localStorage.setItem("checkoutTotal", totalAmount.innerText);
+
+  // 👉 Redirect to payment page
+  window.location.href = "payment.html";
 }
 
-/* ---------------- MODAL ---------------- */
-function openModal(){
-  editingAddressId=null;
-  modalTitle.innerText="Add Address";
-  clearForm();
-  addressModal.style.display="flex";
-}
-function closeModal(){
-  addressModal.style.display="none";
-}
-function clearForm(){
-  name.value=phone.value=line1.value=line2.value=city.value=state.value=pincode.value="";
-}
 
-/* ---------------- SAVE / UPDATE ADDRESS ---------------- */
-async function saveAddress(){
-  const body={
-    name:name.value,
-    phone:phone.value,
-    addressLine1:line1.value,
-    addressLine2:line2.value,
-    city:city.value,
-    state:state.value,
-    pincode:pincode.value
-  };
+    /* ================= MODAL ================= */
+    function openModal() {
+      editingIndex = null;
+      modalTitle.innerText = "Add Address";
+      clearForm();
+      addressModal.style.display = "flex";
+    }
+    function closeModal() { addressModal.style.display = "none" }
+    function clearForm() {
+      name.value = phone.value = line1.value = line2.value = city.value = state.value = pincode.value = "";
+    }
 
-  const url = editingAddressId
-    ? API+"/api/checkout/address/"+editingAddressId
-    : API+"/api/checkout/address";
+    /* ================= SAVE ADDRESS ================= */
+    function saveAddress() {
+      const addr = {
+        name: name.value,
+        phone: phone.value,
+        line1: line1.value,
+        line2: line2.value,
+        city: city.value,
+        state: state.value,
+        pincode: pincode.value
+      };
 
-  const method = editingAddressId ? "PUT" : "POST";
+      if (editingIndex !== null) addresses[editingIndex] = addr;
+      else addresses.push(addr);
 
-  await fetch(url,{
-    method,
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:token
-    },
-    body:JSON.stringify(body)
-  });
+      localStorage.setItem("addresses", JSON.stringify(addresses));
+      closeModal();
+      loadAddresses();
+    }
 
-  closeModal();
-  loadAddresses();
-}
-
-/* ---------------- EDIT ADDRESS ---------------- */
-async function editAddress(id,e){
-  e.stopPropagation();
-  editingAddressId=id;
-  modalTitle.innerText="Edit Address";
-
-  const res=await fetch(API+"/api/checkout/address",{
-    headers:{Authorization:token}
-  });
-  const addresses=await res.json();
-  const a=addresses.find(x=>x._id===id);
-
-  name.value=a.name;
-  phone.value=a.phone;
-  line1.value=a.addressLine1;
-  line2.value=a.addressLine2 || "";
-  city.value=a.city;
-  state.value=a.state;
-  pincode.value=a.pincode;
-
-  addressModal.style.display="flex";
-}
-
-/* ---------------- DELETE ADDRESS ---------------- */
-async function deleteAddress(id,e){
-  e.stopPropagation();
-  if(!confirm("Delete this address?")) return;
-
-  await fetch(API+"/api/checkout/address/"+id,{
-    method:"DELETE",
-    headers:{Authorization:token}
-  });
-  loadAddresses();
-}
-</script>
+    /* ================= EDIT / DELETE ================= */
+    function editAddress(i, e) {
+      e.stopPropagation();
+      editingIndex = i;
+      const a = addresses[i];
+      modalTitle.innerText = "Edit Address";
+      name.value = a.name;
+      phone.value = a.phone;
+      line1.value = a.line1;
+      line2.value = a.line2;
+      city.value = a.city;
+      state.value = a.state;
+      pincode.value = a.pincode;
+      addressModal.style.display = "flex";
+    }
+    function deleteAddress(i, e) {
+      e.stopPropagation();
+      if (!confirm("Delete address?")) return;
+      addresses.splice(i, 1);
+      localStorage.setItem("addresses", JSON.stringify(addresses));
+      selectedAddress = null;
+      loadAddresses();
+    }
+  </script>
 
 </body>
+
 </html>

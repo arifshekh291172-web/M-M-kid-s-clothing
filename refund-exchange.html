@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Refund & Exchange | M&M Kid's Wear</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #334155;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .08);
+        }
+
+        h1,
+        h2 {
+            color: var(--primary)
+        }
+
+        h2 {
+            margin-top: 28px
+        }
+
+        p,
+        li {
+            line-height: 1.7;
+            font-size: 15px
+        }
+
+        ul {
+            padding-left: 18px
+        }
+
+        .highlight {
+            background: #eff6ff;
+            border-left: 6px solid var(--accent);
+            padding: 16px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .lang-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- 🌐 LANGUAGE SWITCH -->
+        <div class="lang-bar">
+            <select id="langSelect" onchange="setLanguage(this.value)">
+                <option value="en">🌐 English</option>
+                <option value="hi">🇮🇳 Hindi</option>
+                <option value="mr">🟠 Marathi</option>
+            </select>
+        </div>
+
+        <h1 data-key="title"></h1>
+        <p><strong data-key="effective"></strong></p>
+
+        <div class="highlight" data-key="rule"></div>
+
+        <h2 data-key="eligible"></h2>
+        <ul>
+            <li data-key="el1"></li>
+            <li data-key="el2"></li>
+            <li data-key="el3"></li>
+        </ul>
+
+        <h2 data-key="notEligible"></h2>
+        <ul>
+            <li data-key="nel1"></li>
+            <li data-key="nel2"></li>
+            <li data-key="nel3"></li>
+        </ul>
+
+        <h2 data-key="refundProcess"></h2>
+        <p data-key="refundDesc"></p>
+
+        <h2 data-key="exchangeProcess"></h2>
+        <p data-key="exchangeDesc"></p>
+
+    </div>
+
+    <script>
+        /* ===============================
+           TRANSLATIONS
+        ================================ */
+        const translations = {
+            en: {
+                title: "Refund & Exchange Policy",
+                effective: "Effective Date: 2025",
+                rule: "Refund and exchange requests are accepted only within 48 hours of delivery.",
+                eligible: "Eligible for Refund / Exchange",
+                el1: "Product must be unused and unwashed",
+                el2: "Original tags and packaging must be intact",
+                el3: "Request raised within 48 hours of delivery",
+                notEligible: "Not Eligible",
+                nel1: "Used or damaged products",
+                nel2: "Requests made after 48 hours",
+                nel3: "Products without original tags",
+                refundProcess: "Refund Process",
+                refundDesc: "Approved refunds are processed within 5–7 business days to the original payment method.",
+                exchangeProcess: "Exchange Process",
+                exchangeDesc: "Exchanges are allowed for size or same-value products, subject to availability."
+            },
+
+            hi: {
+                title: "रिफंड और एक्सचेंज नीति",
+                effective: "प्रभावी तिथि: 2025",
+                rule: "डिलीवरी के 48 घंटे के भीतर ही रिफंड या एक्सचेंज स्वीकार किया जाएगा।",
+                eligible: "रिफंड / एक्सचेंज के लिए योग्य",
+                el1: "प्रोडक्ट इस्तेमाल या धुला हुआ नहीं होना चाहिए",
+                el2: "ओरिजिनल टैग और पैकेजिंग जरूरी है",
+                el3: "48 घंटे के अंदर अनुरोध करना होगा",
+                notEligible: "योग्य नहीं",
+                nel1: "इस्तेमाल या खराब प्रोडक्ट",
+                nel2: "48 घंटे के बाद अनुरोध",
+                nel3: "बिना टैग वाले प्रोडक्ट",
+                refundProcess: "रिफंड प्रक्रिया",
+                refundDesc: "स्वीकृत रिफंड 5–7 कार्यदिवसों में वापस किया जाएगा।",
+                exchangeProcess: "एक्सचेंज प्रक्रिया",
+                exchangeDesc: "साइज़ या समान कीमत वाले प्रोडक्ट के लिए एक्सचेंज संभव है।"
+            },
+
+            mr: {
+                title: "परतावा आणि एक्सचेंज धोरण",
+                effective: "प्रभावी दिनांक: 2025",
+                rule: "डिलिव्हरीनंतर 48 तासांच्या आतच परतावा किंवा एक्सचेंज स्वीकारले जाईल.",
+                eligible: "परतावा / एक्सचेंजसाठी पात्र",
+                el1: "उत्पादन वापरलेले किंवा धुतलेले नसावे",
+                el2: "मूळ टॅग आणि पॅकेजिंग आवश्यक",
+                el3: "48 तासांत विनंती करणे आवश्यक",
+                notEligible: "अपात्र",
+                nel1: "वापरलेले किंवा खराब उत्पादन",
+                nel2: "48 तासांनंतरची विनंती",
+                nel3: "टॅग नसलेले उत्पादन",
+                refundProcess: "परतावा प्रक्रिया",
+                refundDesc: "मंजूर परतावा 5–7 कामकाजाच्या दिवसांत दिला जाईल.",
+                exchangeProcess: "एक्सचेंज प्रक्रिया",
+                exchangeDesc: "साइझ किंवा समान किमतीसाठी एक्सचेंज उपलब्ध आहे."
+            }
+        };
+
+        /* ===============================
+           LANGUAGE FUNCTIONS
+        ================================ */
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            document.querySelectorAll("[data-key]").forEach(el => {
+                el.innerText = t[el.dataset.key];
+            });
+            localStorage.setItem("siteLang", lang);
+            document.getElementById("langSelect").value = lang;
+        }
+
+        function setLanguage(lang) {
+            applyLanguage(lang);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            applyLanguage(localStorage.getItem("siteLang") || "en");
+        });
+    </script>
+
+</body>
+
+</html>

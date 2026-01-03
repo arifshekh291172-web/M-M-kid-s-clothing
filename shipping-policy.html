@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Shipping Policy | M&M Kid's Wear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #334155;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, .08);
+    }
+
+    h1,
+    h2 {
+      color: var(--primary)
+    }
+
+    h2 {
+      margin-top: 28px
+    }
+
+    p,
+    li {
+      line-height: 1.7;
+      font-size: 15px
+    }
+
+    ul {
+      padding-left: 18px
+    }
+
+    .highlight {
+      background: #eff6ff;
+      border-left: 6px solid var(--accent);
+      padding: 16px;
+      border-radius: 10px;
+      margin: 20px 0;
+      font-weight: 600;
+    }
+
+    .lang-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+
+    select {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- 🌐 LANGUAGE SWITCH -->
+    <div class="lang-bar">
+      <select id="langSelect" onchange="setLanguage(this.value)">
+        <option value="en">🌐 English</option>
+        <option value="hi">🇮🇳 Hindi</option>
+        <option value="mr">🟠 Marathi</option>
+      </select>
+    </div>
+
+    <h1 data-key="title"></h1>
+    <p><strong data-key="effective"></strong></p>
+
+    <div class="highlight" data-key="highlight"></div>
+
+    <h2 data-key="delivery"></h2>
+    <ul>
+      <li data-key="delivery1"></li>
+      <li data-key="delivery2"></li>
+    </ul>
+
+    <h2 data-key="charges"></h2>
+    <p data-key="charges_desc"></p>
+
+    <h2 data-key="delay"></h2>
+    <p data-key="delay_desc"></p>
+
+    <h2 data-key="support"></h2>
+    <p data-key="support_desc"></p>
+
+  </div>
+
+  <script>
+    /* ===============================
+       TRANSLATIONS
+    ================================ */
+    const translations = {
+      en: {
+        title: "Shipping Policy",
+        effective: "Effective Date: 2025",
+        highlight: "Orders are processed within 24–48 hours after confirmation.",
+        delivery: "Delivery Time",
+        delivery1: "Metro cities: 3–5 business days",
+        delivery2: "Other locations: 5–7 business days",
+        charges: "Shipping Charges",
+        charges_desc: "Shipping charges (if applicable) are shown during checkout.",
+        delay: "Delays",
+        delay_desc: "Delivery may be delayed due to weather or logistics issues.",
+        support: "Support",
+        support_desc: "For shipping issues, contact us at support@mmkidswear.com"
+      },
+
+      hi: {
+        title: "शिपिंग नीति",
+        effective: "प्रभावी तिथि: 2025",
+        highlight: "ऑर्डर कन्फर्म होने के 24–48 घंटे में प्रोसेस किए जाते हैं।",
+        delivery: "डिलीवरी समय",
+        delivery1: "मेट्रो शहर: 3–5 कार्यदिवस",
+        delivery2: "अन्य स्थान: 5–7 कार्यदिवस",
+        charges: "शिपिंग शुल्क",
+        charges_desc: "शुल्क चेकआउट के समय दिखाया जाएगा।",
+        delay: "देरी",
+        delay_desc: "मौसम या लॉजिस्टिक कारणों से देरी हो सकती है।",
+        support: "सहायता",
+        support_desc: "शिपिंग समस्या के लिए संपर्क करें: support@mmkidswear.com"
+      },
+
+      mr: {
+        title: "शिपिंग धोरण",
+        effective: "प्रभावी दिनांक: 2025",
+        highlight: "ऑर्डर कन्फर्म झाल्यानंतर 24–48 तासांत प्रोसेस होतात.",
+        delivery: "डिलिव्हरी वेळ",
+        delivery1: "मेट्रो शहरे: 3–5 कामकाजाचे दिवस",
+        delivery2: "इतर ठिकाणे: 5–7 कामकाजाचे दिवस",
+        charges: "शिपिंग शुल्क",
+        charges_desc: "शुल्क चेकआउटवेळी दाखवले जातील.",
+        delay: "उशीर",
+        delay_desc: "हवामान किंवा लॉजिस्टिक कारणांमुळे उशीर होऊ शकतो.",
+        support: "मदत",
+        support_desc: "शिपिंग समस्येसाठी संपर्क: support@mmkidswear.com"
+      }
+    };
+
+    /* ===============================
+       APPLY LANGUAGE
+    ================================ */
+    function applyLanguage(lang) {
+      const data = translations[lang];
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const key = el.getAttribute("data-key");
+        el.innerText = data[key];
+      });
+      localStorage.setItem("siteLang", lang);
+      document.getElementById("langSelect").value = lang;
+    }
+
+    /* ===============================
+       SET LANGUAGE
+    ================================ */
+    function setLanguage(lang) {
+      applyLanguage(lang);
+    }
+
+    /* ===============================
+       INIT
+    ================================ */
+    document.addEventListener("DOMContentLoaded", () => {
+      const saved = localStorage.getItem("siteLang") || "en";
+      applyLanguage(saved);
+    });
+  </script>
+
+</body>
+
+</html>

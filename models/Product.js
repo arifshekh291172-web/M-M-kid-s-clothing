@@ -6,24 +6,25 @@ const mongoose = require("mongoose");
 const sizeSchema = new mongoose.Schema(
   {
     label: {
-      type: String,
+      type: String,          // e.g. "1Y-2Y", "2Y-3Y"
       required: true,
       trim: true
     },
     stock: {
-      type: Number,
+      type: Number,          // stock for that size
       required: true,
       min: 0
     }
   },
   { _id: false }
-); 
+);
 
 /* ======================================================
-   PRODUCT SCHEMA
+   PRODUCT SCHEMA (E-COMMERCE READY)
 ====================================================== */
 const productSchema = new mongoose.Schema(
   {
+    /* BASIC INFO */
     name: {
       type: String,
       required: true,
@@ -50,6 +51,7 @@ const productSchema = new mongoose.Schema(
       default: ""
     },
 
+    /* PRICING */
     price: {
       type: Number,
       required: true,
@@ -63,18 +65,19 @@ const productSchema = new mongoose.Schema(
     },
 
     discount: {
-      type: Number,
+      type: Number,          // auto calculated %
       default: 0
     },
 
+    /* INVENTORY */
     stock: {
-      type: Number,
+      type: Number,          // total stock (auto from sizes)
       default: 0,
       min: 0
     },
 
     sizes: {
-      type: [sizeSchema],
+      type: [sizeSchema],    // size-wise stock
       default: []
     },
 
@@ -84,6 +87,7 @@ const productSchema = new mongoose.Schema(
       index: true
     },
 
+    /* RATINGS */
     rating: {
       type: Number,
       default: 0,
@@ -96,16 +100,18 @@ const productSchema = new mongoose.Schema(
       default: 0
     },
 
+    /* MEDIA (BASE64 IMAGES) */
     image: {
-      type: String,
+      type: String,          // main image (BASE64)
       required: true
     },
 
     images: {
-      type: [String],
+      type: [String],        // extra images (BASE64)
       default: []
     },
 
+    /* BADGE */
     badge: {
       type: String,
       enum: ["New", "Bestseller", "Popular", "Trending", "Hot Deal", ""],
@@ -114,7 +120,6 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 /* ======================================================
    AUTO CALCULATE DISCOUNT %
 ====================================================== */

@@ -1,10 +1,11 @@
 /* =========================================
    GLOBAL STATE
 ========================================= */
+// const API = "https://m-m-kid-s-clothing.onrender.com";
 
 let products = [];
 let displayedProducts = [];
-let cart = [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentCategory = "all";
 
 /* =========================================
@@ -13,7 +14,47 @@ let currentCategory = "all";
 document.addEventListener("DOMContentLoaded", () => {
   loadProducts();
   startBannerSlider();
+  initAccount(); // <-- initialize account UI state
 });
+
+/* =========================================
+   ACCOUNT DROPDOWN
+========================================= */
+function toggleAccount(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById("accountDropdown");
+  if (!dropdown) return;
+  dropdown.classList.toggle("show");
+}
+
+document.addEventListener("click", () => {
+  const dropdown = document.getElementById("accountDropdown");
+  if (dropdown) dropdown.classList.remove("show");
+});
+
+
+
+/* =========================================
+   LOGIN STATE
+========================================= */
+function initAccount() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const accountName = document.getElementById("accountName");
+  const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (user) {
+    accountName.innerText = user.name || "My Account";
+    if (loginBtn) loginBtn.style.display = "none";
+    if (logoutBtn) logoutBtn.style.display = "flex";
+  }
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  location.reload();
+}
 
 /* =========================================
    LOAD PRODUCTS (BACKEND)
@@ -44,15 +85,15 @@ function renderProducts() {
     return;
   }
 
-  grid.innerHTML = displayedProducts.map(p => {
+  grid.innerHTML = displayedProducts
+    .map((p) => {
+      // ✅ BASE64 IMAGE (DIRECT FROM DB)
+      const imageSrc =
+        p.image && p.image.startsWith("data:image")
+          ? p.image
+          : "https://dummyimage.com/300x400/eee/000&text=No+Image";
 
-    // ✅ BASE64 IMAGE (DIRECT FROM DB)
-    const imageSrc =
-      p.image && p.image.startsWith("data:image")
-        ? p.image
-        : "https://dummyimage.com/300x400/eee/000&text=No+Image";
-
-    return `
+      return `
       <div class="product-card" onclick="openProduct('${p._id}')">
 
         <div class="product-image-wrapper">
@@ -81,7 +122,7 @@ function renderProducts() {
 
           <div class="product-price">
             <span class="current-price">₹${p.price}</span>
-            <span class="original-price">₹${p.originalPrice}</span>
+            <span class="original-price">₹${p.originalPrice || ""}</span>
             <span class="discount">${p.discount || 0}% off</span>
           </div>
 
@@ -98,7 +139,8 @@ function renderProducts() {
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 /* =========================================
@@ -114,14 +156,17 @@ function openProduct(id) {
 function filterByCategory(category, btn) {
   currentCategory = category;
 
-  document.querySelectorAll(".category-btn")
-    .forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".category-btn").forEach((b) =>
+    b.classList.remove("active")
+  );
   if (btn) btn.classList.add("active");
 
   displayedProducts =
     category === "all"
       ? [...products]
-      : products.filter(p => p.category.toLowerCase() === category);
+      : products.filter(
+        (p) => p.category && p.category.toLowerCase() === category
+      );
 
   renderProducts();
   scrollToProducts();
@@ -131,7 +176,7 @@ function filterByCategory(category, btn) {
    SORT PRODUCTS
 ========================================= */
 function sortProducts() {
-  const value = document.getElementById("sortFilter").value;
+  const value = document.getElementById("sortFilter")?.value;
 
   switch (value) {
     case "price-low":
@@ -144,13 +189,15 @@ function sortProducts() {
       displayedProducts.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       break;
     case "discount":
-      displayedProducts.sort((a, b) => (b.discount || 0) - (a.discount || 0));
+      displayedProducts.sort(
+        (a, b) => (b.discount || 0) - (a.discount || 0)
+      );
       break;
     default:
       displayedProducts =
         currentCategory === "all"
           ? [...products]
-          : products.filter(p => p.category === currentCategory);
+          : products.filter((p) => p.category === currentCategory);
   }
 
   renderProducts();
@@ -160,12 +207,16 @@ function sortProducts() {
    SEARCH
 ========================================= */
 function searchProducts() {
-  const term = document.getElementById("searchInput").value.toLowerCase().trim();
+  const term = document
+    .getElementById("searchInput")
+    .value.toLowerCase()
+    .trim();
 
-  displayedProducts = products.filter(p =>
-    p.name.toLowerCase().includes(term) ||
-    p.brand.toLowerCase().includes(term) ||
-    p.category.toLowerCase().includes(term)
+  displayedProducts = products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(term) ||
+      p.brand.toLowerCase().includes(term) ||
+      p.category.toLowerCase().includes(term)
   );
 
   renderProducts();
@@ -180,17 +231,27 @@ function addToCart(productId) {
   if (!product) return;
 
   const existing = cart.find(i => i._id === productId);
-  if (existing) existing.qty++;
-  else cart.push({ ...product, qty: 1 });
+
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      size: product.size || "Free",
+      qty: 1
+    });
+  }
+
+  // 🔥 SAVE TO LOCALSTORAGE
+  localStorage.setItem("cart", JSON.stringify(cart));
 
   updateCart();
   showToast("Added to cart");
 }
 
-function buyNow(productId) {
-  addToCart(productId);
-  toggleCart();
-}
 
 function updateCart() {
   const cartCount = document.getElementById("cartCount");
@@ -206,7 +267,9 @@ function updateCart() {
     return;
   }
 
-  cartItems.innerHTML = cart.map(i => `
+  cartItems.innerHTML = cart
+    .map(
+      (i) => `
     <div class="cart-item">
       <img src="${i.image}">
       <div>
@@ -214,7 +277,9 @@ function updateCart() {
         <p>₹${i.price}</p>
       </div>
     </div>
-  `).join("");
+  `
+    )
+    .join("");
 
   cartTotal.innerText = "₹" + cart.reduce((s, i) => s + i.price * i.qty, 0);
   cartFooter.style.display = "block";
@@ -244,8 +309,9 @@ function startBannerSlider() {
    UTIL
 ========================================= */
 function scrollToProducts() {
-  document.getElementById("productsSection")
-    .scrollIntoView({ behavior: "smooth" });
+  document
+    .getElementById("productsSection")
+    ?.scrollIntoView({ behavior: "smooth" });
 }
 
 function showToast(msg) {
@@ -253,4 +319,11 @@ function showToast(msg) {
   t.innerText = msg;
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* =========================================
+   PLACEHOLDER
+========================================= */
+function toggleWishlist() {
+  showToast("Wishlist feature coming soon");
 }

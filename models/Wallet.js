@@ -19,7 +19,7 @@ const transactionSchema = new mongoose.Schema(
     },
 
     reason: {
-      type: String, // Order Payment / Refund / Cancel / Adjustment
+      type: String, // Order Payment / Refund / Cancel / Admin Adjustment
       required: true,
       trim: true
     },
@@ -29,7 +29,12 @@ const transactionSchema = new mongoose.Schema(
       ref: "Order"
     },
 
-    date: {
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment"
+    },
+
+    createdAt: {
       type: Date,
       default: Date.now
     }
@@ -69,7 +74,37 @@ const walletSchema = new mongoose.Schema(
 );
 
 /* ======================================================
-   INDEXES (PERFORMANCE)
+   INSTANCE METHODS (SAFE OPERATIONS)
 ====================================================== */
+
+// CREDIT AMOUNT (Refund / Cashback / Admin Credit)
+walletSchema.methods.credit = function (amount, reason, orderId, paymentId) {
+  this.balance += amount;
+
+  this.transactions.unshift({
+    type: "CREDIT",
+    amount,
+    reason,
+    orderId,
+    paymentId
+  });
+};
+
+// DEBIT AMOUNT (Wallet Payment)
+walletSchema.methods.debit = function (amount, reason, orderId, paymentId) {
+  if (this.balance < amount) {
+    throw new Error("Insufficient wallet balance");
+  }
+
+  this.balance -= amount;
+
+  this.transactions.unshift({
+    type: "DEBIT",
+    amount,
+    reason,
+    orderId,
+    paymentId
+  });
+};
 
 module.exports = mongoose.model("Wallet", walletSchema);

@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema(
   {
-    /* ===============================
+    /* ======================================================
        CORE REFERENCES
-    =============================== */
+    ====================================================== */
     orderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
@@ -15,12 +15,13 @@ const paymentSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: true,
+      index: true
     },
 
-    /* ===============================
+    /* ======================================================
        RAZORPAY DETAILS
-    =============================== */
+    ====================================================== */
     razorpayOrderId: {
       type: String,
       required: true,
@@ -36,17 +37,22 @@ const paymentSchema = new mongoose.Schema(
       type: String
     },
 
-    /* ===============================
+    /* ======================================================
        PAYMENT INFO
-    =============================== */
+    ====================================================== */
     amount: {
       type: Number,
-      required: true
+      required: true // INR
     },
 
     currency: {
       type: String,
       default: "INR"
+    },
+
+    paymentMethod: {
+      type: String, // card, upi, netbanking, wallet
+      default: ""
     },
 
     status: {
@@ -56,9 +62,13 @@ const paymentSchema = new mongoose.Schema(
       index: true
     },
 
-    /* ===============================
-       REFUND INFO
-    =============================== */
+    paidAt: {
+      type: Date
+    },
+
+    /* ======================================================
+       REFUND INFO (48 HOURS POLICY READY)
+    ====================================================== */
     refundId: {
       type: String
     },
@@ -75,16 +85,16 @@ const paymentSchema = new mongoose.Schema(
       type: Date
     },
 
-    /* ===============================
+    /* ======================================================
        WEBHOOK / META
-    =============================== */
+    ====================================================== */
     webhookVerified: {
       type: Boolean,
       default: false
     },
 
-    paymentMethod: {
-      type: String, // card, upi, netbanking
+    failureReason: {
+      type: String
     }
   },
   {

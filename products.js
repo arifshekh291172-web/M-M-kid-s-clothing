@@ -51,7 +51,7 @@ function renderProduct(p) {
         <button
           class="size-btn ${s.stock === 0 ? "disabled" : ""}"
           ${s.stock === 0 ? "disabled" : ""}
-          onclick="selectSize('${s.label}', ${s.stock})">
+          onclick="selectSize('${s.label}', ${s.stock}, this)">
           ${s.label}
         </button>
       `).join("")
@@ -108,8 +108,8 @@ function renderProduct(p) {
         </table>
 
         <div class="action-buttons">
-          <button onclick="addToCart()">ADD TO CART</button>
-          <button onclick="buyNow()">BUY NOW</button>
+          <button class="add-cart" onclick="addToCart()">ADD TO CART</button>
+          <button class="buy-now" onclick="buyNow()">BUY NOW</button>
         </div>
 
       </div>
@@ -120,29 +120,55 @@ function renderProduct(p) {
 /* ===============================
    SIZE SELECT
 ================================ */
-function selectSize(label, stock) {
+function selectSize(label, stock, btn) {
   selectedSize = label;
+
   document.getElementById("stockInfo").innerText =
-    `Selected size: ${label} | Stock: ${stock}`;
+    stock > 5
+      ? `Selected size: ${label} | In Stock`
+      : `Selected size: ${label} | Only ${stock} left`;
+
+  document.querySelectorAll(".size-btn")
+    .forEach(b => b.classList.remove("active"));
+
+  btn.classList.add("active");
 }
 
 /* ===============================
-   CART / BUY
+   CART (LOCAL STORAGE)
 ================================ */
 function addToCart() {
   if (!selectedSize) {
     alert("Please select a size");
     return;
   }
-  alert(`Added ${currentProduct.name} (${selectedSize}) to cart`);
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const existing = cart.find(
+    i => i._id === currentProduct._id && i.size === selectedSize
+  );
+
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({
+      _id: currentProduct._id,
+      name: currentProduct.name,
+      price: currentProduct.price,
+      image: currentProduct.image,
+      size: selectedSize,
+      qty: 1
+    });
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert("🛒 Added to cart");
 }
 
 function buyNow() {
-  if (!selectedSize) {
-    alert("Please select a size");
-    return;
-  }
-  alert(`Proceed to checkout → ${currentProduct.name} (${selectedSize})`);
+  addToCart();
+  window.location.href = "cart.html";
 }
 
 /* ===============================

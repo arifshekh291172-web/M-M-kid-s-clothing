@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Privacy Policy | M&M Kid's Wear</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #334155;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .08);
+        }
+
+        h1,
+        h2 {
+            color: var(--primary)
+        }
+
+        h2 {
+            margin-top: 28px
+        }
+
+        p,
+        li {
+            line-height: 1.7;
+            font-size: 15px
+        }
+
+        ul {
+            padding-left: 18px
+        }
+
+        .highlight {
+            background: #eff6ff;
+            border-left: 6px solid var(--accent);
+            padding: 16px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .lang-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- 🌐 LANGUAGE SWITCH -->
+        <div class="lang-bar">
+            <select id="langSelect" onchange="setLanguage(this.value)">
+                <option value="en">🌐 English</option>
+                <option value="hi">🇮🇳 Hindi</option>
+                <option value="mr">🟠 Marathi</option>
+            </select>
+        </div>
+
+        <h1 data-key="title"></h1>
+        <p><strong data-key="effective"></strong></p>
+
+        <p data-key="intro"></p>
+
+        <h2 data-key="collectTitle"></h2>
+        <ul>
+            <li data-key="collect1"></li>
+            <li data-key="collect2"></li>
+            <li data-key="collect3"></li>
+        </ul>
+
+        <div class="highlight" data-key="secure"></div>
+
+        <h2 data-key="useTitle"></h2>
+        <ul>
+            <li data-key="use1"></li>
+            <li data-key="use2"></li>
+            <li data-key="use3"></li>
+        </ul>
+
+        <h2 data-key="refundTitle"></h2>
+        <p data-key="refundDesc"></p>
+
+        <h2 data-key="contactTitle"></h2>
+        <p data-key="contactDesc"></p>
+
+    </div>
+
+    <script>
+        /* ===============================
+           TRANSLATIONS
+        ================================ */
+        const translations = {
+            en: {
+                title: "Privacy Policy",
+                effective: "Effective Date: 2025",
+                intro: "M&M Kid’s Wear respects your privacy and is committed to protecting your personal information.",
+                collectTitle: "Information We Collect",
+                collect1: "Name, phone number, and email address",
+                collect2: "Shipping and billing address",
+                collect3: "Order and transaction details",
+                secure: "We do NOT store card, UPI, or bank details.",
+                useTitle: "How We Use Your Information",
+                use1: "To process and deliver orders",
+                use2: "To provide customer support",
+                use3: "For security and legal compliance",
+                refundTitle: "Refund & Exchange",
+                refundDesc: "Refunds and exchanges are allowed only within 48 hours of delivery as per our policy.",
+                contactTitle: "Contact Us",
+                contactDesc: "For privacy concerns, email us at support@mmkidswear.com"
+            },
+
+            hi: {
+                title: "गोपनीयता नीति",
+                effective: "प्रभावी तिथि: 2025",
+                intro: "M&M Kid’s Wear आपकी गोपनीयता का सम्मान करता है और आपकी जानकारी की सुरक्षा करता है।",
+                collectTitle: "हम कौन-सी जानकारी एकत्र करते हैं",
+                collect1: "नाम, फोन नंबर और ईमेल",
+                collect2: "शिपिंग और बिलिंग पता",
+                collect3: "ऑर्डर और लेन-देन विवरण",
+                secure: "हम कार्ड, UPI या बैंक डिटेल्स स्टोर नहीं करते।",
+                useTitle: "हम जानकारी का उपयोग कैसे करते हैं",
+                use1: "ऑर्डर प्रोसेस और डिलीवरी के लिए",
+                use2: "कस्टमर सपोर्ट के लिए",
+                use3: "सुरक्षा और कानूनी कारणों से",
+                refundTitle: "रिफंड और एक्सचेंज",
+                refundDesc: "डिलीवरी के 48 घंटे के भीतर ही रिफंड / एक्सचेंज मान्य है।",
+                contactTitle: "संपर्क करें",
+                contactDesc: "गोपनीयता से जुड़े सवालों के लिए ईमेल करें: support@mmkidswear.com"
+            },
+
+            mr: {
+                title: "गोपनीयता धोरण",
+                effective: "प्रभावी दिनांक: 2025",
+                intro: "M&M Kid’s Wear तुमच्या गोपनीयतेचा आदर करते आणि माहिती सुरक्षित ठेवते.",
+                collectTitle: "आम्ही कोणती माहिती गोळा करतो",
+                collect1: "नाव, फोन नंबर आणि ईमेल",
+                collect2: "शिपिंग व बिलिंग पत्ता",
+                collect3: "ऑर्डर व व्यवहार तपशील",
+                secure: "आम्ही कार्ड, UPI किंवा बँक माहिती साठवत नाही.",
+                useTitle: "माहितीचा वापर",
+                use1: "ऑर्डर प्रक्रिया व डिलिव्हरीसाठी",
+                use2: "ग्राहक सहाय्यासाठी",
+                use3: "सुरक्षा व कायदेशीर कारणांसाठी",
+                refundTitle: "परतावा आणि एक्सचेंज",
+                refundDesc: "डिलिव्हरीनंतर 48 तासांतच परतावा / एक्सचेंज मान्य आहे.",
+                contactTitle: "संपर्क",
+                contactDesc: "गोपनीयतेसाठी ईमेल करा: support@mmkidswear.com"
+            }
+        };
+
+        /* ===============================
+           LANGUAGE FUNCTIONS
+        ================================ */
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            document.querySelectorAll("[data-key]").forEach(el => {
+                el.innerText = t[el.dataset.key];
+            });
+            localStorage.setItem("siteLang", lang);
+            document.getElementById("langSelect").value = lang;
+        }
+
+        function setLanguage(lang) {
+            applyLanguage(lang);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            applyLanguage(localStorage.getItem("siteLang") || "en");
+        });
+    </script>
+
+</body>
+
+</html>

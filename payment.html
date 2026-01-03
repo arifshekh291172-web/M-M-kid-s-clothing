@@ -1,204 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>Secure Payment | StyleHub</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Secure Payment | M&M Kid's Wear</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Razorpay -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- Razorpay -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Inter, sans-serif;
-            background: #f1f3f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, sans-serif;
+      background: #f1f3f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-        .payment-box {
-            background: #fff;
-            width: 420px;
-            border-radius: 14px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, .15);
-            padding: 30px;
-        }
+    .payment-box {
+      background: #fff;
+      width: 420px;
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.15);
+      padding: 30px;
+    }
 
-        h2 {
-            margin: 0 0 10px;
-            font-size: 22px;
-            text-align: center;
-        }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      text-align: center;
+    }
 
-        .sub {
-            text-align: center;
-            color: #6b7280;
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
+    .sub {
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
 
-        .summary {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
+    .summary {
+      background: #f9fafb;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
 
-        .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
 
-        .row strong {
-            font-size: 16px;
-        }
+    .row strong {
+      font-size: 16px;
+    }
 
-        .pay-btn {
-            width: 100%;
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+    .pay-btn {
+      width: 100%;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-        .pay-btn:hover {
-            background: #1e40af;
-        }
+    .pay-btn:hover {
+      background: #1e40af;
+    }
 
-        .secure {
-            margin-top: 12px;
-            text-align: center;
-            font-size: 12px;
-            color: #6b7280;
-        }
-    </style>
+    .secure {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+    }
+  </style>
 </head>
 
 <body>
 
-    <div class="payment-box">
-        <h2>Secure Payment</h2>
-        <div class="sub">Pay safely using Razorpay</div>
+<div class="payment-box">
+  <h2>Secure Payment</h2>
+  <div class="sub">Pay using Card • UPI • NetBanking</div>
 
-        <div class="summary">
-            <div class="row">
-                <span>Order ID</span>
-                <span id="orderIdText">—</span>
-            </div>
-            <div class="row">
-                <span>Total Amount</span>
-                <strong>₹<span id="amountText">0</span></strong>
-            </div>
-        </div>
-
-        <button class="pay-btn" onclick="payNow()">Pay Now</button>
-
-        <div class="secure">
-            🔒 100% Secure Payments • Cards • UPI • NetBanking
-        </div>
+  <div class="summary">
+    <div class="row">
+      <span>Order ID</span>
+      <span id="orderIdText">—</span>
     </div>
+    <div class="row">
+      <span>Total Amount</span>
+      <strong>₹<span id="amountText">0</span></strong>
+    </div>
+  </div>
 
-    <script>
-        const API = "https://m-m-kid-s-clothing.onrender.com";
-        const token = localStorage.getItem("token");
+  <button class="pay-btn" onclick="payNow()">Pay Now</button>
 
-        // orderId query param se
-        const params = new URLSearchParams(window.location.search);
-        const orderId = params.get("orderId");
+  <div class="secure">
+    🔒 Payments powered by Razorpay
+  </div>
+</div>
 
-        if (!token || !orderId) {
-            alert("Invalid access");
-            window.location.href = "index.html";
-        }
+<script>
+  const API = "https://m-m-kid-s-clothing.onrender.com";
+  const token = localStorage.getItem("token");
 
-        document.getElementById("orderIdText").innerText = orderId;
+  const orderId = new URLSearchParams(window.location.search).get("orderId");
 
-        async function payNow() {
-            try {
-                // 1️⃣ Create Razorpay Order
-                const res = await fetch(API + "/api/payment/create", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: token
-                    },
-                    body: JSON.stringify({ orderId })
-                });
+  if (!token || !orderId) {
+    alert("Invalid payment access");
+    location.href = "index.html";
+  }
 
-                const data = await res.json();
-                if (!data.success) {
-                    alert(data.message || "Payment init failed");
-                    return;
-                }
+  document.getElementById("orderIdText").innerText = orderId;
 
-                document.getElementById("amountText").innerText =
-                    data.razorpayOrder.amount / 100;
+  async function payNow() {
+    try {
+      // 1️⃣ Create Razorpay Order (server side)
+      const res = await fetch(API + "/api/payment/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token
+        },
+        body: JSON.stringify({ orderId })
+      });
 
-                // 2️⃣ Razorpay Options
-                const options = {
-                    key: data.key,
-                    amount: data.razorpayOrder.amount,
-                    currency: "INR",
-                    name: "StyleHub",
-                    description: "Order Payment",
-                    order_id: data.razorpayOrder.id,
+      const data = await res.json();
 
-                    handler: async function (response) {
-                        // 3️⃣ Verify payment
-                        const verify = await fetch(API + "/api/payment/verify", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: token
-                            },
-                            body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                                orderId
-                            })
-                        });
+      if (!data.success) {
+        alert(data.message || "Unable to start payment");
+        return;
+      }
 
-                        const result = await verify.json();
+      document.getElementById("amountText").innerText =
+        data.razorpayOrder.amount / 100;
 
-                        if (result.success) {
-                            alert("✅ Payment Successful!");
-                            window.location.href = "order-success.html?orderId=" + orderId;
-                        } else {
-                            alert("Payment verification failed");
-                        }
-                    },
+      // 2️⃣ Razorpay Options
+      const options = {
+        key: data.key,
+        amount: data.razorpayOrder.amount,
+        currency: "INR",
+        name: "M&M Kid's Wear",
+        description: "Order Payment",
+        order_id: data.razorpayOrder.id,
 
-                    theme: {
-                        color: "#2563eb"
-                    }
-                };
+        // ❌ NO COD — only these methods
+        method: {
+          card: true,
+          upi: true,
+          netbanking: true,
+          wallet: false,
+          emi: false,
+          paylater: false
+        },
 
-                // 4️⃣ Open Razorpay
-                const rzp = new Razorpay(options);
-                rzp.open();
+        handler: async function (response) {
+          // 3️⃣ Verify Payment (server side)
+          const verify = await fetch(API + "/api/payment/verify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId
+            })
+          });
 
-            } catch (err) {
-                console.error(err);
-                alert("Payment error");
-            }
-        }
-    </script>
+          const result = await verify.json();
+
+          if (result.success) {
+            localStorage.removeItem("cart");
+            alert("✅ Payment Successful");
+            location.href = "order-success.html?orderId=" + orderId;
+          } else {
+            alert("❌ Payment verification failed");
+          }
+        },
+
+        modal: {
+          ondismiss: function () {
+            alert("Payment cancelled");
+          }
+        },
+
+        theme: { color: "#2563eb" }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      console.error(err);
+      alert("Payment error occurred");
+    }
+  }
+</script>
 
 </body>
-
 </html>
